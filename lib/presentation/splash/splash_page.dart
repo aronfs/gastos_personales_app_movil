@@ -1,0 +1,66 @@
+import 'package:flutter/material.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
+import 'package:gastos_personales/navigation/route.dart';
+import 'package:gastos_personales/ui.theme/styles/text_style_app.dart';
+import 'package:gastos_personales/ui.theme/theme_app.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+class SplashPage extends StatefulWidget {
+  const SplashPage({super.key});
+
+  @override
+  State<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  @override
+  Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    return Theme(
+      data: AppThemeData.themeSplash,
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: AppThemeData.themeSplash.colorScheme.primary,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: FaIcon(
+                  FontAwesomeIcons.wallet,
+                  size: 64,
+                  color: AppThemeData.themeSplash.colorScheme.surface,
+                ),
+              ),
+              Text(
+                appLocalizations.titleSplash,
+                style: textStyleWhite.display32,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                appLocalizations.descriptionSplash,
+                style: textStyleWhite.body14,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.pushNamed(context, signin);
+    });
+  }
+}

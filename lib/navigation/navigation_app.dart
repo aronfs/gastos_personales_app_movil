@@ -1,0 +1,102 @@
+import 'package:flutter/material.dart';
+import 'package:gastos_personales/layers/movements/domain/entity/movement.dart';
+import 'package:gastos_personales/navigation/route.dart';
+import 'package:gastos_personales/presentation/home/home_page.dart';
+import 'package:gastos_personales/presentation/screens/categories_page.dart';
+import 'package:gastos_personales/presentation/screens/income_page.dart';
+import 'package:gastos_personales/presentation/screens/new_expense_page.dart';
+import 'package:gastos_personales/presentation/screens/new_income_page.dart';
+import 'package:gastos_personales/presentation/screens/new_product_page.dart';
+import 'package:gastos_personales/presentation/screens/scan_barcode_page.dart';
+import 'package:gastos_personales/presentation/screens/supermarket_expense_page.dart';
+import 'package:gastos_personales/presentation/screens/widgets/expenses_page.dart';
+import 'package:gastos_personales/presentation/session/signin_page.dart';
+import 'package:gastos_personales/presentation/session/signup_page.dart';
+import 'package:gastos_personales/presentation/splash/splash_page.dart';
+
+class RouteGenerator {
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case splash:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => SplashPage(),
+        );
+      case home:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => HomePage(),
+        );
+      case signin:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => SigninPage(),
+        );
+      case signup:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => SignupPage(),
+        );
+      case income:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => IncomePage(),
+        );
+      case expenses:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ExpensesPage(),
+        );
+      case categories:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const CategoriesPage(),
+        );
+      case newExpense:
+        final expense = settings.arguments as Movement?;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => NewExpensePage(expense: expense),
+        );
+      case newIncome:
+        final income = settings.arguments as Movement?;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => NewIncomePage(income: income),
+        );
+      case supermarketExpense:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const SupermarketExpensePage(),
+        );
+      case newProduct:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const NewProductPage(),
+        );
+      case scanBarcode:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const ScanBarcodePage(),
+        );
+      default:
+        return _errorRoute();
+    }
+  }
+
+  static Route<dynamic> _errorRoute() {
+    return MaterialPageRoute(
+      builder: (_) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('Error'), centerTitle: true),
+          body: const Center(
+            child: Text(
+              'Error ! No se encontro la ventana',
+              style: TextStyle(color: Colors.red, fontSize: 18.0),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

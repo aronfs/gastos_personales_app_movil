@@ -1,0 +1,28 @@
+{
+    "@@locale": "en",
+    "titleSplash": "Cost-Expenses",
+    "descriptionSplash": "Your Money, Your Control, and Your Financial Freedom",
+    "titleSignIn": "Welcome Back",
+    "descriptionSignIn": "Sign In to continue",
+    "labelemail": "Email",
+    "labelpassword": "Password",
+    "labelforgotpassword": "Forgot Password?",
+    "btnsignin": "Sign In",
+    "labeldontaccount": "Don't have an account?",
+    "btnsignup": "Sign Up",
+    "hintEmail": "Your@email.com",
+    "hintPassword": "*******",
+    "titleSignUp": "Create Account",
+    "labelName": "Name",
+    "hintName": "Your Name",
+    "labelConfirmPassword": "Confirm Password",
+    "descriptionPolities": "Register accept to the terms and Conditions of privacity",
+    "greeting": "Hello",
+    "balance": "Balance",
+    "incost": "in",
+    "enough": "enough",
+    "saving": "Save",
+    "goal": "Goal"
+
+
+}

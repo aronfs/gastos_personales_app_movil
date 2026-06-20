@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+
+/// Tarjeta cuadrada con borde punteado para la acción de crear una
+/// nueva categoría, sigue el mismo patrón visual que las tarjetas
+/// del grid pero con un "+" en vez de un icono de categoría.
+class AddCategoryCard extends StatelessWidget {
+  final String label;
+  final VoidCallback? onTap;
+
+  const AddCategoryCard({
+    super.key,
+    this.label = 'Nueva',
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: CustomPaint(
+          painter: _DashedRectPainter(
+            color: const Color(0xFFCBCED9),
+            radius: 20,
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            child: Column(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF2F3F7),
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.add,
+                    size: 22,
+                    color: Color(0xFF9A9DB0),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF9A9DB0),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DashedRectPainter extends CustomPainter {
+  final Color color;
+  final double radius;
+
+  _DashedRectPainter({required this.color, required this.radius});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.2
+      ..style = PaintingStyle.stroke;
+
+    final rrect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      Radius.circular(radius),
+    );
+
+    final path = Path()..addRRect(rrect);
+    const double dashWidth = 6;
+    const double dashSpace = 4;
+
+    for (final metric in path.computeMetrics()) {
+      double distance = 0;
+      while (distance < metric.length) {
+        final segment = metric.extractPath(distance, distance + dashWidth);
+        canvas.drawPath(segment, paint);
+        distance += dashWidth + dashSpace;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedRectPainter oldDelegate) {
+    return oldDelegate.color != color || oldDelegate.radius != radius;
+  }
+}

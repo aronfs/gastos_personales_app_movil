@@ -1,0 +1,27 @@
+{
+    "@@locale": "es",
+    "titleSplash": "Gastos-Personales",
+    "descriptionSplash": "Tu Dinero, Tu Control, y Tu Libertad Financiera",
+    "titleSignIn": "Bienvenido de vuelta",
+    "descriptionSignIn": "Ingresa para continuar",
+    "labelemail": "Email",
+    "labelpassword": "Contraseña",
+    "labelforgotpassword": "¿Olvidaste tu contraseña?",
+    "btnsignin": "Iniciar Sesión",
+    "labeldontaccount": "¿No tienes una cuenta?",
+    "btnsignup": "Registrarse",
+    "hintEmail": "Tu@correo.com",
+    "hintPassword": "*******",
+    "titleSignUp": "Crear Cuenta",
+    "labelName": "Nombre",
+    "hintName": "Tu nombre",
+    "labelConfirmPassword": "Confirmar Contraseña",
+    "descriptionPolities": "Al registrarte aceptas los terminos y condiciones de privacidad",
+    "greeting": "Hola",
+    "balance": "Balance Total",
+    "incost": "ingresos",
+    "enough": "gastos",
+    "saving": "Ahorro",
+    "goal": "Meta"
+
+}

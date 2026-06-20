@@ -1,0 +1,11 @@
+import 'package:gastos_personales/layers/login/domain/repository/login_repository.dart';
+
+class SignIn {
+  SignIn({required LoginRepository repository}) : _repository = repository;
+
+  final LoginRepository _repository;
+
+  Future<String> call(String email, String password) async {
+    return await _repository.login(email, password);
+  }
+}

@@ -1,0 +1,13 @@
+const String splash = "/";
+const String home = "/home";
+const String signin = "/signin";
+const String signup = "/signup";
+const String income = "/incomePage";
+const String expenses = "/expensePage";
+const String settings = "/settingsPage";
+const String categories = "/categoriesPage";
+const String newExpense = "/newExpensePage";
+const String newIncome = "/newIncomePage";
+const String supermarketExpense = "/supermarketExpensePage";
+const String newProduct = "/newProductPage";
+const String scanBarcode = "/scanBarcodePage";
