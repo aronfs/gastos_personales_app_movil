@@ -12,7 +12,14 @@ class ScannerInitial extends ScannerState {}
 
 class ScannerCameraLoading extends ScannerState {}
 
-class ScannerScanning extends ScannerState {}
+class ScannerScanning extends ScannerState {
+  final String? warningMessage;
+
+  const ScannerScanning({this.warningMessage});
+
+  @override
+  List<Object?> get props => [warningMessage];
+}
 
 class ScannerProductDetected extends ScannerState {
   final ProductScanResult result;

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -113,18 +114,43 @@ class _ScanOcrViewState extends State<_ScanOcrView> with WidgetsBindingObserver 
     _isBusy = true;
 
     try {
-      final inputImage = _inputImageFromCameraImage(image);
-      if (inputImage == null) {
+      final inputImageData = _inputImageFromCameraImage(image);
+      if (inputImageData == null) {
         _isBusy = false;
         return;
       }
 
-      final recognizedText = await _textRecognizer.processImage(inputImage);
+      final recognizedText = await _textRecognizer.processImage(inputImageData.image);
       
       if (recognizedText.text.isNotEmpty) {
-        // En un caso real guardaríamos el frame actual como imagen.
-        // Aquí pasamos un placeholder temporal o string vacía por ser un stream contínuo.
-        await cubit.processText(recognizedText.text, '');
+        // Calcular ROI en coordenadas de la imagen
+        final screenSize = MediaQuery.of(context).size;
+        
+        final scale = max(
+          screenSize.width / inputImageData.mappedSize.width, 
+          screenSize.height / inputImageData.mappedSize.height
+        );
+        
+        final renderedWidth = inputImageData.mappedSize.width * scale;
+        final renderedHeight = inputImageData.mappedSize.height * scale;
+        
+        final dx = (renderedWidth - screenSize.width) / 2;
+        final dy = (renderedHeight - screenSize.height) / 2;
+        
+        // UI ROI
+        final scanAreaWidth = screenSize.width * 0.85;
+        final scanAreaHeight = scanAreaWidth * 0.4;
+        final uiLeft = (screenSize.width - scanAreaWidth) / 2;
+        final uiTop = (screenSize.height - scanAreaHeight) / 2;
+        
+        final roiRect = Rect.fromLTRB(
+          (uiLeft + dx) / scale, 
+          (uiTop + dy) / scale, 
+          (uiLeft + scanAreaWidth + dx) / scale, 
+          (uiTop + scanAreaHeight + dy) / scale
+        );
+
+        await cubit.processText(recognizedText, roiRect, '');
       }
     } catch (e) {
       debugPrint('Error procesando imagen: $e');
@@ -133,7 +159,7 @@ class _ScanOcrViewState extends State<_ScanOcrView> with WidgetsBindingObserver 
     _isBusy = false;
   }
 
-  InputImage? _inputImageFromCameraImage(CameraImage image) {
+  _InputImageData? _inputImageFromCameraImage(CameraImage image) {
     if (_cameraController == null) return null;
     final camera = _cameraController!.description;
     final sensorOrientation = camera.sensorOrientation;
@@ -156,7 +182,7 @@ class _ScanOcrViewState extends State<_ScanOcrView> with WidgetsBindingObserver 
 
     if (image.planes.isEmpty) return null;
 
-    return InputImage.fromBytes(
+    final inputImage = InputImage.fromBytes(
       bytes: image.planes[0].bytes,
       metadata: InputImageMetadata(
         size: Size(image.width.toDouble(), image.height.toDouble()),
@@ -165,6 +191,16 @@ class _ScanOcrViewState extends State<_ScanOcrView> with WidgetsBindingObserver 
         bytesPerRow: image.planes[0].bytesPerRow,
       ),
     );
+
+    // Determinar tamaño mapeado para Portrait
+    Size mappedSize;
+    if (Platform.isAndroid && (rotation == InputImageRotation.rotation90deg || rotation == InputImageRotation.rotation270deg)) {
+      mappedSize = Size(image.height.toDouble(), image.width.toDouble());
+    } else {
+      mappedSize = Size(image.width.toDouble(), image.height.toDouble());
+    }
+
+    return _InputImageData(image: inputImage, mappedSize: mappedSize);
   }
 
   @override
@@ -334,8 +370,21 @@ class _ScanOcrViewState extends State<_ScanOcrView> with WidgetsBindingObserver 
       body: BlocConsumer<ScannerCubit, ScannerState>(
         listener: (context, state) {
           if (state is ScannerScanning) {
-            _initCamera();
+            if (_cameraController == null || !_cameraController!.value.isStreamingImages) {
+               _initCamera();
+            }
+            if (state.warningMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.warningMessage!),
+                  duration: const Duration(seconds: 1),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Colors.orange.shade800,
+                ),
+              );
+            }
           } else if (state is ScannerProductDetected) {
+            _stopCamera();
             _showProductBottomSheet(context, state.result);
           } else if (state is ScannerError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -482,4 +531,11 @@ class _ScannerOverlayPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _InputImageData {
+  final InputImage image;
+  final Size mappedSize;
+
+  _InputImageData({required this.image, required this.mappedSize});
 }
