@@ -9,6 +9,13 @@ import 'package:gastos_personales/layers/categories/domain/usecase/update_catego
 part 'categories_event.dart';
 part 'categories_state.dart';
 
+List<Category> _extractCategories(CategoriesState state) {
+  if (state is CategoriesLoaded) return state.categories;
+  if (state is CategoriesUpdating) return state.categories;
+  if (state is CategoriesUpdateSuccess) return state.categories;
+  return [];
+}
+
 class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
   final GetCategories _getCategories;
   final CreateCategory _createCategory;
@@ -44,9 +51,7 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
     CategoriesCreateRequested event,
     Emitter<CategoriesState> emit,
   ) async {
-    final current = state;
-    if (current is! CategoriesLoaded) return;
-
+    final current = _extractCategories(state);
     try {
       final created = await _createCategory(
         name: event.name,
@@ -54,7 +59,7 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
         color: event.color,
         type: event.type,
       );
-      emit(CategoriesLoaded([...current.categories, created]));
+      emit(CategoriesLoaded([...current, created]));
     } catch (e) {
       emit(CategoriesError(_parseError(e)));
     }
@@ -64,9 +69,8 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
     CategoriesUpdateRequested event,
     Emitter<CategoriesState> emit,
   ) async {
-    final current = state;
-    if (current is! CategoriesLoaded) return;
-
+    final current = _extractCategories(state);
+    emit(CategoriesUpdating(current));
     try {
       final updated = await _updateCategory(
         id: event.id,
@@ -74,10 +78,10 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
         icon: event.icon,
         color: event.color,
       );
-      final list = current.categories
+      final list = current
           .map((c) => c.id == updated.id ? updated : c)
           .toList();
-      emit(CategoriesLoaded(list));
+      emit(CategoriesUpdateSuccess(list));
     } catch (e) {
       emit(CategoriesError(_parseError(e)));
     }
@@ -87,14 +91,12 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
     CategoriesDeleteRequested event,
     Emitter<CategoriesState> emit,
   ) async {
-    final current = state;
-    if (current is! CategoriesLoaded) return;
-
+    final current = _extractCategories(state);
     try {
       await _deleteCategory(event.id);
       emit(
         CategoriesLoaded(
-          current.categories.where((c) => c.id != event.id).toList(),
+          current.where((c) => c.id != event.id).toList(),
         ),
       );
     } catch (e) {
@@ -104,12 +106,14 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
 
   String _parseError(Object e) {
     final msg = e.toString();
-    if (msg.contains('401') || msg.contains('Unauthorized')) {
+    if (msg.contains('401') || msg.contains('Unauthorized') || msg.contains('Sesión expirada')) {
       return 'Sesión expirada. Inicia sesión de nuevo.';
     }
-    if (msg.contains('SocketException') || msg.contains('Connection')) {
+    if (msg.contains('SocketException') || msg.contains('Connection') || msg.contains('Sin conexión')) {
       return 'Sin conexión a internet.';
     }
-    return 'No se pudieron procesar las categorías. Intenta de nuevo.';
+    return msg.contains('No se pudo') || msg.contains('Error del servidor') || msg.contains('Solicitud inválida') || msg.contains('no existe')
+        ? msg
+        : 'No se pudieron procesar las categorías. Intenta de nuevo.';
   }
 }

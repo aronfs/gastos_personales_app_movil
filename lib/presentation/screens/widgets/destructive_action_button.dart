@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Botón destructivo de ancho completo, fondo rojo claro y texto rojo.
-/// Ej: "Cerrar todas las sesiones".
 class DestructiveActionButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -14,8 +12,11 @@ class DestructiveActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Material(
-      color: const Color(0xFFFCE7E7),
+      color: cs.errorContainer,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -26,10 +27,9 @@ class DestructiveActionButton extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 15.5,
+            style: tt.bodyLarge?.copyWith(
               fontWeight: FontWeight.w700,
-              color: Color(0xFFE05757),
+              color: cs.error,
             ),
           ),
         ),

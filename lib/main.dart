@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/navigation/navigation_app.dart';
 import 'package:gastos_personales/navigation/route.dart';
-import 'package:gastos_personales/ui.theme/styles/color_scheme.dart';
+import 'package:gastos_personales/ui.theme/theme_app.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
@@ -33,16 +33,8 @@ class _MainAppState extends State<MainApp> {
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               onGenerateRoute: RouteGenerator.generateRoute,
-              theme: ThemeData(
-                useMaterial3: true,
-                colorScheme: MaterialTheme.lightScheme(),
-                brightness: Brightness.light,
-              ),
-              darkTheme: ThemeData(
-                useMaterial3: true,
-                colorScheme: MaterialTheme.darkScheme(),
-                brightness: Brightness.dark,
-              ),
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
               themeMode: currentMode,
             );
           },

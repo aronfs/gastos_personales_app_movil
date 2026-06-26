@@ -8,9 +8,9 @@ class UpdateCategory {
 
   Future<Category> call({
     required String id,
-    String? name,
-    String? icon,
-    String? color,
+    required String name,
+    required String icon,
+    required String color,
   }) =>
       _repository.updateCategory(id: id, name: name, icon: icon, color: color);
 }

@@ -18,11 +18,12 @@ class DarkPageAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Row(
       children: [
-        // Botón back
         Material(
-          color: const Color(0xFF1E2235),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.3),
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),
@@ -38,7 +39,6 @@ class DarkPageAppBar extends StatelessWidget {
             ),
           ),
         ),
-        // Título central
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -46,29 +46,28 @@ class DarkPageAppBar extends StatelessWidget {
               if (subtitle != null)
                 Text(
                   subtitle!.toUpperCase(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF6B7090),
+                    color: cs.onSurfaceVariant,
                     letterSpacing: 0.8,
                   ),
                 ),
               if (subtitle != null) const SizedBox(height: 2),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: cs.onSurface,
                 ),
                 textAlign: TextAlign.center,
               ),
             ],
           ),
         ),
-        // Botón campana
         Material(
-          color: const Color(0xFF1E2235),
+          color: cs.surfaceContainerHighest.withValues(alpha: 0.3),
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),

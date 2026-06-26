@@ -6,6 +6,7 @@ import 'package:gastos_personales/layers/reports/domain/entity/report.dart';
 import 'package:gastos_personales/layers/reports/domain/usecase/get_categories_report.dart';
 import 'package:gastos_personales/layers/reports/domain/usecase/get_monthly_report.dart';
 import 'package:gastos_personales/layers/reports/domain/usecase/get_yearly_report.dart';
+
 import 'package:gastos_personales/presentation/screens/bloc/reports/reports_bloc.dart';
 import 'package:gastos_personales/presentation/screens/widgets/category_distribution_card.dart';
 import 'package:gastos_personales/presentation/screens/widgets/category_share.dart';
@@ -183,11 +184,16 @@ class _MonthContent extends StatelessWidget {
         const SizedBox(height: 16),
 
         // ── Distribución por categoría ───────────────────────────
-        if (catShares.isNotEmpty)
+        if (catShares.isNotEmpty) ...[
+          _CategorySectionHeader(
+            onManage: () => Navigator.pushNamed(context, '/categoriesPage'),
+          ),
+          const SizedBox(height: 8),
           CategoryDistributionCard(
             totalLabel: '\$ ${s.totalExpense.toStringAsFixed(0)}',
             categories: catShares,
           ),
+        ],
       ],
     );
   }
@@ -249,11 +255,16 @@ class _YearContent extends StatelessWidget {
         const SizedBox(height: 16),
 
         // ── Distribución por categoría ───────────────────────────
-        if (catShares.isNotEmpty)
+        if (catShares.isNotEmpty) ...[
+          _CategorySectionHeader(
+            onManage: () => Navigator.pushNamed(context, '/categoriesPage'),
+          ),
+          const SizedBox(height: 8),
           CategoryDistributionCard(
             totalLabel: '\$ ${s.totalExpense.toStringAsFixed(0)}',
             categories: catShares,
           ),
+        ],
       ],
     );
   }
@@ -403,6 +414,40 @@ class _ErrorView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Encabezado de sección de categorías ───────────────────────────────────────
+class _CategorySectionHeader extends StatelessWidget {
+  final VoidCallback onManage;
+
+  const _CategorySectionHeader({required this.onManage});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    return Row(
+      children: [
+        Icon(Icons.category_outlined, size: 18, color: cs.onSurfaceVariant),
+        const SizedBox(width: 6),
+        Text(
+          'Categories',
+          style: tt.titleSmall?.copyWith(color: cs.onSurfaceVariant),
+        ),
+        const Spacer(),
+        TextButton.icon(
+          onPressed: onManage,
+          icon: const Icon(Icons.tune, size: 16),
+          label: const Text('Manage'),
+          style: TextButton.styleFrom(
+            visualDensity: VisualDensity.compact,
+            foregroundColor: cs.primary,
+          ),
+        ),
+      ],
     );
   }
 }

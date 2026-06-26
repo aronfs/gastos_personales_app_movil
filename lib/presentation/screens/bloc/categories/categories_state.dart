@@ -15,10 +15,28 @@ class CategoriesLoading extends CategoriesState {
   const CategoriesLoading();
 }
 
+class CategoriesUpdating extends CategoriesState {
+  final List<Category> categories;
+
+  const CategoriesUpdating(this.categories);
+
+  @override
+  List<Object?> get props => [categories];
+}
+
 class CategoriesLoaded extends CategoriesState {
   final List<Category> categories;
 
   const CategoriesLoaded(this.categories);
+
+  @override
+  List<Object?> get props => [categories];
+}
+
+class CategoriesUpdateSuccess extends CategoriesState {
+  final List<Category> categories;
+
+  const CategoriesUpdateSuccess(this.categories);
 
   @override
   List<Object?> get props => [categories];

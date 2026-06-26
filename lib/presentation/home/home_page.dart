@@ -25,9 +25,6 @@ class _HomePageState extends State<HomePage> {
         width: 70,
         height: 70,
         child: FloatingActionButton(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          shape: const CircleBorder(),
           onPressed: () => _showAddMenu(context),
           child: const Icon(Icons.add, size: 32),
         ),

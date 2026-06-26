@@ -17,11 +17,12 @@ class DashboardLoading extends DashboardState {
 
 class DashboardLoaded extends DashboardState {
   final DashboardSummary summary;
+  final String userName;
 
-  const DashboardLoaded(this.summary);
+  const DashboardLoaded(this.summary, {this.userName = ''});
 
   @override
-  List<Object?> get props => [summary];
+  List<Object?> get props => [summary, userName];
 }
 
 class DashboardError extends DashboardState {

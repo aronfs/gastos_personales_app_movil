@@ -8,6 +8,7 @@ import 'package:gastos_personales/presentation/screens/new_expense_page.dart';
 import 'package:gastos_personales/presentation/screens/new_income_page.dart';
 import 'package:gastos_personales/presentation/screens/new_product_page.dart';
 import 'package:gastos_personales/presentation/screens/scan_barcode_page.dart';
+import 'package:gastos_personales/presentation/screens/settings_page.dart';
 import 'package:gastos_personales/presentation/screens/supermarket_expense_page.dart';
 import 'package:gastos_personales/presentation/screens/widgets/expenses_page.dart';
 import 'package:gastos_personales/presentation/session/signin_page.dart';
@@ -15,68 +16,73 @@ import 'package:gastos_personales/presentation/session/signup_page.dart';
 import 'package:gastos_personales/presentation/splash/splash_page.dart';
 
 class RouteGenerator {
-  static Route<dynamic> generateRoute(RouteSettings settings) {
-    switch (settings.name) {
+  static Route<dynamic> generateRoute(RouteSettings routeSettings) {
+    switch (routeSettings.name) {
       case splash:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => SplashPage(),
         );
       case home:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => HomePage(),
         );
       case signin:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => SigninPage(),
         );
       case signup:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => SignupPage(),
         );
       case income:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => IncomePage(),
         );
       case expenses:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => ExpensesPage(),
         );
       case categories:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => const CategoriesPage(),
         );
       case newExpense:
-        final expense = settings.arguments as Movement?;
+        final expense = routeSettings.arguments as Movement?;
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => NewExpensePage(expense: expense),
         );
       case newIncome:
-        final income = settings.arguments as Movement?;
+        final income = routeSettings.arguments as Movement?;
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => NewIncomePage(income: income),
         );
       case supermarketExpense:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => const SupermarketExpensePage(),
         );
       case newProduct:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => const NewProductPage(),
+        );
+      case settings:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const SettingsPage(),
         );
       case scanBarcode:
         return MaterialPageRoute(
-          settings: settings,
+          settings: routeSettings,
           builder: (_) => const ScanBarcodePage(),
         );
       default:

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// App bar simple: título a la izquierda y botón circular de
-/// notificaciones a la derecha. Usado en pantallas raíz como
-/// "Gastos", "Ingresos" o "Categorías".
+/// notificaciones a la derecha.
 class SimplePageAppBar extends StatelessWidget {
   final String title;
   final VoidCallback? onNotificationsTap;
@@ -15,30 +14,31 @@ class SimplePageAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1A2E),
+          style: tt.headlineLarge?.copyWith(
+            color: cs.onSurface,
           ),
         ),
         Material(
-          color: const Color(0xFFF2F3F7),
+          color: cs.surfaceContainerLow,
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: onNotificationsTap,
-            child: const SizedBox(
+            child: SizedBox(
               width: 44,
               height: 44,
               child: Icon(
                 Icons.notifications_none,
                 size: 22,
-                color: Color(0xFF1A1A2E),
+                color: cs.onSurface,
               ),
             ),
           ),

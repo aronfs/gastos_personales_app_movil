@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Botón sólido de ancho completo, usado como acción primaria
-/// (ej. "Guardar gasto", "Registrar ingreso"). El color es
-/// configurable para adaptarse al contexto (azul para gastos,
-/// verde para ingresos).
 class PrimaryActionButton extends StatelessWidget {
   final String label;
   final Color color;
@@ -12,14 +8,18 @@ class PrimaryActionButton extends StatelessWidget {
   const PrimaryActionButton({
     super.key,
     required this.label,
-    this.color = const Color(0xFF2962FF),
+    this.color = const Color(0xFF2563EB),
     this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final bgColor = color == const Color(0xFF2563EB) ? cs.primary : color;
+
     return Material(
-      color: color,
+      color: bgColor,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -30,10 +30,9 @@ class PrimaryActionButton extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 15.5,
+            style: tt.bodyLarge?.copyWith(
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: cs.onPrimary,
             ),
           ),
         ),

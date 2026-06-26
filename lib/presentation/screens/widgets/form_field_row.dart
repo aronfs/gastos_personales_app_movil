@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Fila de campo de formulario: icono circular a la izquierda, una
-/// etiqueta pequeña arriba (ej. "CATEGORÍA") y el valor en negrita
-/// debajo, con chevron a la derecha indicando que es editable.
 class FormFieldRow extends StatelessWidget {
   final IconData icon;
   final Color iconBackgroundColor;
@@ -23,8 +20,11 @@ class FormFieldRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Material(
-      color: Colors.white,
+      color: cs.surface,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -33,7 +33,7 @@ class FormFieldRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFEEF0F4), width: 1),
+            border: Border.all(color: cs.outlineVariant, width: 1),
           ),
           child: Row(
             children: [
@@ -55,29 +55,27 @@ class FormFieldRow extends StatelessWidget {
                   children: [
                     Text(
                       label.toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 11.5,
+                      style: tt.labelSmall?.copyWith(
+                        color: cs.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF9A9DB0),
                         letterSpacing: 0.3,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       value,
-                      style: const TextStyle(
-                        fontSize: 15.5,
+                      style: tt.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A2E),
+                        color: cs.onSurface,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right,
                 size: 22,
-                color: Color(0xFFB7BAC6),
+                color: cs.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ],
           ),

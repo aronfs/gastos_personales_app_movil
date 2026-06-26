@@ -30,15 +30,15 @@ class CategoriesCreateRequested extends CategoriesEvent {
 
 class CategoriesUpdateRequested extends CategoriesEvent {
   final String id;
-  final String? name;
-  final String? icon;
-  final String? color;
+  final String name;
+  final String icon;
+  final String color;
 
   const CategoriesUpdateRequested({
     required this.id,
-    this.name,
-    this.icon,
-    this.color,
+    required this.name,
+    required this.icon,
+    required this.color,
   });
 
   @override

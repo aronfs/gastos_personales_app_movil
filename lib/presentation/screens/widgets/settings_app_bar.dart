@@ -20,6 +20,9 @@ class SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return SizedBox(
       height: preferredSize.height,
       child: Row(
@@ -27,22 +30,24 @@ class SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
           _CircleIconButton(
             icon: Icons.arrow_back_ios_new,
             iconSize: 16,
+            color: cs.onSurface,
+            bgColor: cs.surfaceContainerLow,
             onTap: onBack ?? () => Navigator.of(context).maybePop(),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A1A2E),
+              style: tt.headlineMedium?.copyWith(
+                color: cs.onSurface,
               ),
             ),
           ),
           _CircleIconButton(
             icon: Icons.notifications_none,
             iconSize: 20,
+            color: cs.onSurface,
+            bgColor: cs.surfaceContainerLow,
             onTap: onNotificationsTap,
           ),
         ],
@@ -54,18 +59,22 @@ class SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
 class _CircleIconButton extends StatelessWidget {
   final IconData icon;
   final double iconSize;
+  final Color color;
+  final Color bgColor;
   final VoidCallback? onTap;
 
   const _CircleIconButton({
     required this.icon,
     required this.iconSize,
+    required this.color,
+    required this.bgColor,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0xFFF2F3F7),
+      color: bgColor,
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -73,7 +82,7 @@ class _CircleIconButton extends StatelessWidget {
         child: SizedBox(
           width: 40,
           height: 40,
-          child: Icon(icon, size: iconSize, color: const Color(0xFF1A1A2E)),
+          child: Icon(icon, size: iconSize, color: color),
         ),
       ),
     );

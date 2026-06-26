@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/navigation/route.dart';
 import 'package:gastos_personales/ui.theme/styles/text_style_app.dart';
 import 'package:gastos_personales/ui.theme/theme_app.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -16,8 +16,13 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
+    final cs = AppTheme.light.colorScheme;
+
     return Theme(
-      data: AppThemeData.themeSplash,
+      data: AppTheme.light.copyWith(
+        scaffoldBackgroundColor: cs.primary,
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF2563EB)),
+      ),
       child: Scaffold(
         body: Center(
           child: Column(
@@ -25,18 +30,13 @@ class _SplashPageState extends State<SplashPage> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: AppThemeData.themeSplash.colorScheme.primary,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                  ),
+                  color: cs.primary,
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
                 ),
                 child: FaIcon(
                   FontAwesomeIcons.wallet,
                   size: 64,
-                  color: AppThemeData.themeSplash.colorScheme.surface,
+                  color: cs.surface,
                 ),
               ),
               Text(

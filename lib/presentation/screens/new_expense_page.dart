@@ -227,12 +227,12 @@ class _NewExpensePageState extends State<NewExpensePage> {
         },
         builder: (context, state) {
           final loading = state is ExpenseFormLoading;
+          final cs = Theme.of(context).colorScheme;
           final categoryColor = _selectedCategory != null
               ? colorFromHex(_selectedCategory!.color)
               : const Color(0xFFC8923B);
 
           return Scaffold(
-            backgroundColor: const Color(0xFFF5F6FA),
             body: SafeArea(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -262,8 +262,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   const SizedBox(height: 12),
                   FormFieldRow(
                     icon: Icons.calendar_today_outlined,
-                    iconBackgroundColor: const Color(0xFFDCE6FB),
-                    iconColor: const Color(0xFF2962FF),
+                    iconBackgroundColor: cs.primary.withValues(alpha: 0.15),
+                    iconColor: cs.primary,
                     label: 'Fecha',
                     value: formatDisplayDate(_selectedDate),
                     onTap: loading ? null : _pickDate,
@@ -271,8 +271,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   const SizedBox(height: 12),
                   FormFieldRow(
                     icon: Icons.sell_outlined,
-                    iconBackgroundColor: const Color(0xFFD7F2EC),
-                    iconColor: const Color(0xFF1FAE8E),
+                    iconBackgroundColor: cs.secondary.withValues(alpha: 0.15),
+                    iconColor: cs.secondary,
                     label: 'Descripción',
                     value: _descriptionController.text.isEmpty
                         ? 'Agregar descripción'
@@ -282,8 +282,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   const SizedBox(height: 12),
                   FormFieldRow(
                     icon: Icons.attach_money,
-                    iconBackgroundColor: const Color(0xFFFCEDD3),
-                    iconColor: const Color(0xFFC8923B),
+                    iconBackgroundColor: cs.tertiary.withValues(alpha: 0.15),
+                    iconColor: cs.tertiary,
                     label: 'Monto',
                     value: _amountController.text.isEmpty
                         ? '\$ 0.00'
@@ -301,7 +301,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                     label: loading
                         ? 'Guardando...'
                         : (_isEditing ? 'Actualizar gasto' : 'Guardar gasto'),
-                    color: const Color(0xFF2962FF),
+                    color: cs.primary,
                     onPressed: loading ? null : () => _submit(context),
                   ),
                   const SizedBox(height: 8),

@@ -1,5 +1,8 @@
 import 'package:gastos_personales/layers/categories/domain/entity/category.dart';
 
+String _string(Map<String, dynamic> json, String key) =>
+    (json[key] is String) ? json[key] as String : '';
+
 class CategoryDto extends Category {
   const CategoryDto({
     required super.id,
@@ -10,16 +13,21 @@ class CategoryDto extends Category {
     required super.type,
   });
 
-  factory CategoryDto.fromMap(Map<String, dynamic> json) => CategoryDto(
-    id: json['id'] as String,
-    userId: json['userId'] as String,
-    name: json['name'] as String,
-    icon: json['icon'] as String,
-    color: json['color'] as String,
-    type: (json['type'] as String).toUpperCase() == 'INCOME'
-        ? CategoryType.income
-        : CategoryType.expense,
-  );
+  factory CategoryDto.fromMap(Map<String, dynamic> json) {
+    final data = json.containsKey('data') && json['data'] is Map
+        ? json['data'] as Map<String, dynamic>
+        : json;
+    return CategoryDto(
+      id: _string(data, 'id'),
+      userId: _string(data, 'userId'),
+      name: _string(data, 'name'),
+      icon: _string(data, 'icon'),
+      color: _string(data, 'color'),
+      type: _string(data, 'type').toUpperCase() == 'INCOME'
+          ? CategoryType.income
+          : CategoryType.expense,
+    );
+  }
 
   Map<String, dynamic> toCreateMap() => {
     'name': name,
@@ -29,15 +37,16 @@ class CategoryDto extends Category {
   };
 
   Map<String, dynamic> toUpdateMap() => {
-    if (name.isNotEmpty) 'name': name,
-    if (icon.isNotEmpty) 'icon': icon,
-    if (color.isNotEmpty) 'color': color,
+    'name': name,
+    'icon': icon,
+    'color': color,
   };
 
   static List<Category> listFromResponse(Map<String, dynamic> json) {
-    final data = json['data'] as List;
-    return data
-        .map((e) => CategoryDto.fromMap(e as Map<String, dynamic>))
+    final raw = json['data'];
+    final list = (raw is List) ? raw : [];
+    return list
+        .map((e) => CategoryDto.fromMap({'data': e}))
         .toList();
   }
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'settings_leading_icon.dart';
 
-/// Fila de configuración navegable: icono, título, valor opcional a la
-/// derecha (ej. "Español", "USD — \$") y chevron. Ej: "Idioma", "Moneda".
 class SettingsNavigationRow extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -19,6 +17,9 @@ class SettingsNavigationRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -32,28 +33,25 @@ class SettingsNavigationRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 15.5,
+                  style: tt.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A2E),
+                    color: cs.onSurface,
                   ),
                 ),
               ),
               if (value != null) ...[
                 Text(
                   value!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF9A9DB0),
-                    fontWeight: FontWeight.w500,
+                  style: tt.bodyMedium?.copyWith(
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(width: 6),
               ],
-              const Icon(
+              Icon(
                 Icons.chevron_right,
                 size: 22,
-                color: Color(0xFFB7BAC6),
+                color: cs.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ],
           ),

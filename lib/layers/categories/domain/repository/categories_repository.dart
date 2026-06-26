@@ -10,9 +10,9 @@ abstract class CategoriesRepository {
   });
   Future<Category> updateCategory({
     required String id,
-    String? name,
-    String? icon,
-    String? color,
+    required String name,
+    required String icon,
+    required String color,
   });
   Future<void> deleteCategory(String id);
 }

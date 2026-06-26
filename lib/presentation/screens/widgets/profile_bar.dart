@@ -1,10 +1,17 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 class ProfileBar extends StatelessWidget {
   final String name;
   final String gretting;
+  final Uint8List? imageBytes;
 
-  const ProfileBar({super.key, required this.name, required this.gretting});
+  const ProfileBar({
+    super.key,
+    required this.name,
+    required this.gretting,
+    this.imageBytes,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,28 +21,21 @@ class ProfileBar extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [cs.primaryFixedDim, cs.primary],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?',
-              style: tt.labelSmall?.copyWith(
-                color: cs.onPrimary,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
+        CircleAvatar(
+          radius: 22,
+          backgroundColor: cs.primaryFixedDim,
+          backgroundImage: imageBytes != null ? MemoryImage(imageBytes!) : null,
+          child: imageBytes == null
+              ? Text(
+                  name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?',
+                  style: tt.labelSmall?.copyWith(
+                    color: cs.onPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    letterSpacing: 0.5,
+                  ),
+                )
+              : null,
         ),
         const SizedBox(width: 10),
         Column(

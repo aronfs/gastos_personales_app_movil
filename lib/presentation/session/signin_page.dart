@@ -10,7 +10,6 @@ import 'package:gastos_personales/presentation/session/widgets/hint_label.dart';
 import 'package:gastos_personales/presentation/session/widgets/label_form.dart';
 import 'package:gastos_personales/presentation/session/widgets/text_forms.dart';
 import 'package:gastos_personales/ui.theme/size_app.dart';
-import 'package:gastos_personales/ui.theme/theme_app.dart';
 
 /// Provee el [SignInBloc] y monta la pantalla.
 class SigninPage extends StatelessWidget {
@@ -62,142 +61,139 @@ class _SigninViewState extends State<_SigninView> {
     final loc = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
 
-    return Theme(
-      data: AppThemeData.themeForms,
-      child: BlocListener<SignInBloc, SignInState>(
-        listener: (context, state) {
-          if (state is SignInSuccess) {
-            Navigator.pushNamedAndRemoveUntil(context, home, (_) => false);
-          } else if (state is SignInFailure) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(content: Text(state.error), backgroundColor: cs.error),
-              );
-          }
-        },
-        child: Scaffold(
-          body: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 35),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 50),
-      
-                    // ── Ícono ──────────────────────────────────────────
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: cs.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: FaIcon(
-                        FontAwesomeIcons.wallet,
-                        size: 30,
-                        color: cs.onPrimary,
-                      ),
+    return BlocListener<SignInBloc, SignInState>(
+      listener: (context, state) {
+        if (state is SignInSuccess) {
+          Navigator.pushNamedAndRemoveUntil(context, home, (_) => false);
+        } else if (state is SignInFailure) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(content: Text(state.error), backgroundColor: cs.error),
+            );
+        }
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 35),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 50),
+
+                  // ── Icon ──────────────────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: cs.primary,
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(height: 20),
-      
-                    // ── Título y subtítulo ────────────────────────────
-                    TextForms(
-                      title: loc.titleSignIn,
-                      subtitle: loc.descriptionSignIn,
+                    child: FaIcon(
+                      FontAwesomeIcons.wallet,
+                      size: 30,
+                      color: cs.onPrimary,
                     ),
-                    const SizedBox(height: 20),
-      
-                    // ── Email ─────────────────────────────────────────
-                    LabelForm(label: loc.labelemail),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.all(20),
-                          child: FaIcon(FontAwesomeIcons.envelope),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // ── Title & subtitle ────────────────────────────
+                  TextForms(
+                    title: loc.titleSignIn,
+                    subtitle: loc.descriptionSignIn,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // ── Email ─────────────────────────────────────────
+                  LabelForm(label: loc.labelemail),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.all(20),
+                        child: FaIcon(FontAwesomeIcons.envelope),
+                      ),
+                      hintText: loc.hintEmail,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // ── Password ──────────────────────────────────────
+                  LabelForm(label: loc.labelpassword),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: _isObscure,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (_) => _submit(context),
+                    decoration: InputDecoration(
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.all(20),
+                        child: FaIcon(FontAwesomeIcons.lock),
+                      ),
+                      hintText: loc.hintPassword,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isObscure
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
                         ),
-                        hintText: loc.hintEmail,
+                        onPressed: _togglePassword,
                       ),
                     ),
-                    const SizedBox(height: 10),
-      
-                    // ── Password ──────────────────────────────────────
-                    LabelForm(label: loc.labelpassword),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: _isObscure,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => _submit(context),
-                      decoration: InputDecoration(
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.all(20),
-                          child: FaIcon(FontAwesomeIcons.lock),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // ── Forgot password ─────────────────────────────
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      loc.labelforgotpassword,
+                      style: TextStyle(color: cs.primary),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // ── Button / loading ───────────────────────────────
+                  BlocBuilder<SignInBloc, SignInState>(
+                    buildWhen: (_, curr) =>
+                        curr is SignInLoading ||
+                        curr is SignInInitial ||
+                        curr is SignInFailure,
+                    builder: (context, state) {
+                      final isLoading = state is SignInLoading;
+                      return SizedBox(
+                        width: double.infinity,
+                        height: sizeButton.height,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : () => _submit(context),
+                          child: isLoading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: cs.onPrimary,
+                                  ),
+                                )
+                              : Text(loc.btnsignin),
                         ),
-                        hintText: loc.hintPassword,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isObscure
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                          ),
-                          onPressed: _togglePassword,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-      
-                    // ── Olvidé contraseña ─────────────────────────────
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        loc.labelforgotpassword,
-                        style: TextStyle(color: cs.primary),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-      
-                    // ── Botón / loading ───────────────────────────────
-                    BlocBuilder<SignInBloc, SignInState>(
-                      buildWhen: (_, curr) =>
-                          curr is SignInLoading ||
-                          curr is SignInInitial ||
-                          curr is SignInFailure,
-                      builder: (context, state) {
-                        final isLoading = state is SignInLoading;
-                        return SizedBox(
-                          width: double.infinity,
-                          height: sizeButton.height,
-                          child: ElevatedButton(
-                            onPressed: isLoading ? null : () => _submit(context),
-                            child: isLoading
-                                ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: cs.onPrimary,
-                                    ),
-                                  )
-                                : Text(loc.btnsignin),
-                          ),
-                        );
-                      },
-                    ),
-      
-                    // ── Hint: ¿No tienes cuenta? ──────────────────────
-                    HintLabel(
-                      label1: loc.labeldontaccount,
-                      label2: loc.btnsignup,
-                      toPage: signup,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
+                      );
+                    },
+                  ),
+
+                  // ── Hint: No account? ──────────────────────
+                  HintLabel(
+                    label1: loc.labeldontaccount,
+                    label2: loc.btnsignup,
+                    toPage: signup,
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
           ),

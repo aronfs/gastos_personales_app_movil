@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'settings_leading_icon.dart';
 
-/// Fila de configuración con icono, título (y subtítulo opcional) y un
-/// switch a la derecha. Ej: "Tema oscuro", "Acceso biométrico".
 class SettingsSwitchRow extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -21,6 +19,9 @@ class SettingsSwitchRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -34,19 +35,17 @@ class SettingsSwitchRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 15.5,
+                  style: tt.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A2E),
+                    color: cs.onSurface,
                   ),
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      color: Color(0xFF9A9DB0),
+                    style: tt.labelSmall?.copyWith(
+                      color: cs.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -56,10 +55,9 @@ class SettingsSwitchRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: Colors.white,
-            activeTrackColor: const Color(0xFF2962FF),
-            inactiveThumbColor: Colors.white,
-            inactiveTrackColor: const Color(0xFFE2E4EA),
+            activeTrackColor: cs.primary,
+            inactiveThumbColor: cs.surface,
+            inactiveTrackColor: cs.surfaceContainerHighest,
           ),
         ],
       ),

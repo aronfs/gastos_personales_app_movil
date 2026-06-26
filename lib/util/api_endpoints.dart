@@ -27,4 +27,10 @@ class ApiEndpoints {
   static final String reportsMonth = '$baseUrl/reports/monthly';
   static final String reportsYear = '$baseUrl/reports/yearly';
   static final String reportsCategories = '$baseUrl/reports/categories';
+
+  //Profile
+  static final String profile = '$baseUrl/profile';
+  static final String profileDeactivate = '$baseUrl/profile/deactivate';
+  static final String profileImage = '$baseUrl/profile-image';
+  static final String profileImageFile = '$baseUrl/profile-image/file';
 }

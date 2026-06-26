@@ -14,9 +14,9 @@ abstract class CategoriesApi {
   });
   Future<Category> updateCategory({
     required String id,
-    String? name,
-    String? icon,
-    String? color,
+    required String name,
+    required String icon,
+    required String color,
   });
   Future<void> deleteCategory(String id);
 }
@@ -71,7 +71,6 @@ class CategoriesApiImpl implements CategoriesApi {
         data: dto.toCreateMap(),
         options: await _authOptions,
       );
-      // La API devuelve el objeto creado directamente
       final data = response.data as Map<String, dynamic>;
       return CategoryDto.fromMap(data);
     } on DioException catch (e) {
@@ -84,30 +83,54 @@ class CategoriesApiImpl implements CategoriesApi {
   @override
   Future<Category> updateCategory({
     required String id,
-    String? name,
-    String? icon,
-    String? color,
+    required String name,
+    required String icon,
+    required String color,
   }) async {
     try {
       final dto = CategoryDto(
         id: id,
         userId: '',
-        name: name ?? '',
-        icon: icon ?? '',
-        color: color ?? '',
-        type: CategoryType.expense, // placeholder, no se envía en update
+        name: name,
+        icon: icon,
+        color: color,
+        type: CategoryType.expense,
       );
-      final response = await _dio.patch(
+      final response = await _dio.put(
         '${ApiEndpoints.categories}/$id',
         data: dto.toUpdateMap(),
         options: await _authOptions,
       );
-      final data = response.data as Map<String, dynamic>;
-      return CategoryDto.fromMap(data);
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return CategoryDto.fromMap(data);
+      }
+
+      throw Exception('Error inesperado: ${response.statusCode}');
     } on DioException catch (e) {
-      throw Exception(
-        'Update category error: ${e.response?.statusCode} ${e.message}',
-      );
+      final statusCode = e.response?.statusCode;
+      final body = e.response?.data;
+
+      String message;
+      if (statusCode == 400) {
+        message = (body is Map && body['message'] is String)
+            ? body['message'] as String
+            : 'Solicitud inválida. Verifica los datos.';
+      } else if (statusCode == 401) {
+        message = 'Sesión expirada. Inicia sesión de nuevo.';
+      } else if (statusCode == 404) {
+        message = 'La categoría ya no existe.';
+      } else if (statusCode != null && statusCode >= 500) {
+        message = 'Error del servidor. Intenta más tarde.';
+      } else if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        message = 'Sin conexión a internet.';
+      } else {
+        message = 'No se pudo actualizar la categoría. Intenta de nuevo.';
+      }
+      throw Exception(message);
     }
   }
 

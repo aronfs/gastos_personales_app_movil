@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/dashboard/data/dashboard_repository_impl.dart';
 import 'package:gastos_personales/layers/dashboard/data/source/network/dashboard_api.dart';
 import 'package:gastos_personales/layers/dashboard/domain/usecase/get_dashboard.dart';
+import 'package:gastos_personales/presentation/providers/profile_provider.dart';
 import 'package:gastos_personales/presentation/screens/bloc/dashboard/dashboard_bloc.dart';
 import 'package:gastos_personales/presentation/screens/widgets/balance_card.dart';
 import 'package:gastos_personales/presentation/screens/widgets/category_summary_card.dart';
@@ -16,10 +18,17 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => DashboardBloc(
-        GetDashboard(DashboardRepositoryImpl(DashboardApiImpl())),
-      )..add(const DashboardFetchRequested()),
+    return MultiProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => DashboardBloc(
+            GetDashboard(DashboardRepositoryImpl(DashboardApiImpl())),
+          )..add(const DashboardFetchRequested()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ProfileImageProvider()..loadImage(),
+        ),
+      ],
       child: const _DashboardView(),
     );
   }
@@ -75,7 +84,10 @@ class _DashboardView extends StatelessWidget {
             }
 
             // ── Loaded ─────────────────────────────────────────────────
-            final summary = (state as DashboardLoaded).summary;
+            final loaded = state as DashboardLoaded;
+            final summary = loaded.summary;
+            final userName = loaded.userName;
+            final imageBytes = context.watch<ProfileImageProvider>().imageBytes;
 
             return RefreshIndicator(
               onRefresh: () async => context.read<DashboardBloc>().add(
@@ -91,7 +103,11 @@ class _DashboardView extends StatelessWidget {
                       right: 35,
                       top: 20,
                     ),
-                    child: ProfileBar(gretting: loc.greeting, name: 'aaron'),
+                    child: ProfileBar(
+                      gretting: loc.greeting,
+                      name: userName.isNotEmpty ? userName : 'Usuario',
+                      imageBytes: imageBytes,
+                    ),
                   ),
 
                   // ── Balance card ─────────────────────────────────────

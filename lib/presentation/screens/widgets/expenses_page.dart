@@ -81,11 +81,9 @@ class _ExpensesViewState extends State<_ExpensesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF2962FF),
         onPressed: () => _openForm(context),
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add),
       ),
       body: SafeArea(
         child: BlocBuilder<ExpensesBloc, ExpensesState>(

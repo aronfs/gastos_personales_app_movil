@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastos_personales/presentation/screens/change_password_page.dart';
 import 'package:gastos_personales/presentation/screens/widgets/active_session_row.dart';
 import 'package:gastos_personales/presentation/screens/widgets/destructive_action_button.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_app_bar.dart';
@@ -20,19 +21,42 @@ class _SecurityPageState extends State<SecurityPage> {
   bool _smsTwoFactor = false;
 
   void _handleCloseAllSessions() {
-    // Aquí se podría disparar la lógica para cerrar todas las sesiones,
-    // ej. mostrando un diálogo de confirmación.
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Cerrar todas las sesiones'),
+        content: const Text(
+          'Se cerrarán todas las sesiones activas, incluyendo la actual. '
+          'Deberás iniciar sesión nuevamente.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Sesiones cerradas correctamente')),
+              );
+            },
+            child: const Text('Cerrar todo', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
-            SettingsAppBar(title: 'Seguridad'),
+            const SettingsAppBar(title: 'Seguridad'),
             const SizedBox(height: 16),
             const SettingsSectionHeader(title: 'Cuenta'),
             SettingsGroupCard(
@@ -40,7 +64,10 @@ class _SecurityPageState extends State<SecurityPage> {
                 SettingsNavigationRow(
                   icon: Icons.lock_outline,
                   title: 'Cambiar contraseña',
-                  onTap: () {},
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ChangePasswordPage()),
+                  ),
                 ),
                 SettingsSwitchRow(
                   icon: Icons.fingerprint,

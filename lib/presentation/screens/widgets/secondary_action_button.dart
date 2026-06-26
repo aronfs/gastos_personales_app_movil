@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Botón secundario de ancho completo, sin relleno, usado para
-/// acciones como "Cancelar".
 class SecondaryActionButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -14,6 +12,9 @@ class SecondaryActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(18),
@@ -26,10 +27,9 @@ class SecondaryActionButton extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 15.5,
+            style: tt.bodyLarge?.copyWith(
               fontWeight: FontWeight.w600,
-              color: Color(0xFF4A4D5E),
+              color: cs.onSurfaceVariant,
             ),
           ),
         ),

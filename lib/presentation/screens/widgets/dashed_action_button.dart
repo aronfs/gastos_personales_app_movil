@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Botón de ancho completo con borde punteado, usado para acciones
-/// secundarias como "Adjuntar comprobante".
 class DashedActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -16,6 +14,9 @@ class DashedActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -23,7 +24,7 @@ class DashedActionButton extends StatelessWidget {
         onTap: onPressed,
         child: CustomPaint(
           painter: _DashedBorderPainter(
-            color: const Color(0xFFCBCED9),
+            color: cs.outlineVariant,
             radius: 18,
           ),
           child: Container(
@@ -33,14 +34,13 @@ class DashedActionButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 18, color: const Color(0xFF2962FF)),
+                Icon(icon, size: 18, color: cs.primary),
                 const SizedBox(width: 8),
                 Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 14.5,
+                  style: tt.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A2E),
+                    color: cs.onSurface,
                   ),
                 ),
               ],
