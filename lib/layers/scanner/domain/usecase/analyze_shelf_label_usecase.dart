@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:gastos_personales/layers/scanner/domain/entity/product_scan_result.dart';

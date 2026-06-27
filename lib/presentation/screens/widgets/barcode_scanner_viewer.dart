@@ -77,9 +77,9 @@ class _BarcodeScannerViewerState extends State<BarcodeScannerViewer>
                     gradient: LinearGradient(
                       colors: [
                         Colors.transparent,
-                        const Color(0xFF2F6BFF).withOpacity(0.8),
+                        const Color(0xFF2F6BFF).withValues(alpha: 0.8),
                         const Color(0xFF2F6BFF),
-                        const Color(0xFF2F6BFF).withOpacity(0.8),
+                        const Color(0xFF2F6BFF).withValues(alpha: 0.8),
                         Colors.transparent,
                       ],
                     ),
@@ -124,7 +124,7 @@ class _BarcodeScannerViewerState extends State<BarcodeScannerViewer>
                 vertical: 10,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E2235).withOpacity(0.92),
+                color: const Color(0xFF1E2235).withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Text(
@@ -160,8 +160,8 @@ class _BarcodeSimPainter extends CustomPainter {
     double x = size.width * 0.12;
     bool dark = true;
     for (final w in widths) {
-      paint.color = dark
-          ? Colors.white.withOpacity(0.18)
+          paint.color = dark
+          ? Colors.white.withValues(alpha: 0.18)
           : Colors.transparent;
       canvas.drawRect(Rect.fromLTWH(x, size.height * 0.18, w, size.height * 0.64), paint);
       x += w + 1;

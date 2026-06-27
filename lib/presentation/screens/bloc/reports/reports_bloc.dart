@@ -14,13 +14,10 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
   final GetCategoriesReport _getCategories;
 
   ReportsBloc({
-    required GetMonthlyReport getMonthly,
-    required GetYearlyReport getYearly,
-    required GetCategoriesReport getCategories,
-  }) : _getMonthly = getMonthly,
-       _getYearly = getYearly,
-       _getCategories = getCategories,
-       super(const ReportsInitial()) {
+    required this._getMonthly,
+    required this._getYearly,
+    required this._getCategories,
+  }) : super(const ReportsInitial()) {
     on<ReportsFetchRequested>(_onFetch);
     on<ReportsPeriodChanged>(_onPeriodChanged);
   }

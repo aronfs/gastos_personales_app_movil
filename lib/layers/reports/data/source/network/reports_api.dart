@@ -1,3 +1,5 @@
+// ignore_for_file: use_null_aware_elements
+
 import 'package:dio/dio.dart';
 import 'package:gastos_personales/layers/reports/data/dto/report_dto.dart';
 import 'package:gastos_personales/layers/reports/domain/entity/report.dart';

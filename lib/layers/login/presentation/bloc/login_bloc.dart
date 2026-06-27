@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gastos_personales/layers/login/domain/usecase/sign_in.dart';
@@ -9,9 +10,8 @@ part 'login_state.dart';
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final SignIn _signIn;
 
-  LoginBloc({required SignIn signIn})
-    : _signIn = signIn,
-      super(const LoginInitial()) {
+  LoginBloc({required this._signIn})
+    : super(const LoginInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
     on<LoginReset>(_onLoginReset);
   }
@@ -26,7 +26,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       await TokenStorage.saveToken(token);
       emit(LoginSuccess(token));
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       emit(LoginFailure(_parseError(e)));
     }
   }
@@ -44,7 +44,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (msg.contains('SocketException') || msg.contains('Connection')) {
       return 'Sin conexión a internet.';
     }
-    print(msg);
+    debugPrint(msg);
     return 'Ocurrió un error. Intenta de nuevo.';
   }
 }

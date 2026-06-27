@@ -179,7 +179,7 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
 
                 const SizedBox(height: 24),
                 DropdownButtonFormField<CategoryType>(
-                  value: _selectedType,
+                  initialValue: _selectedType,
                   decoration: const InputDecoration(
                     labelText: 'Tipo',
                     border: OutlineInputBorder(),

@@ -15,17 +15,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final DeleteProfileImage _deleteProfileImage;
 
   ProfileBloc({
-    required GetProfile getProfile,
-    required UpdateProfile updateProfile,
-    required DeactivateProfile deactivateProfile,
-    required UploadProfileImage uploadProfileImage,
-    required DeleteProfileImage deleteProfileImage,
-  })  : _getProfile = getProfile,
-        _updateProfile = updateProfile,
-        _deactivateProfile = deactivateProfile,
-        _uploadProfileImage = uploadProfileImage,
-        _deleteProfileImage = deleteProfileImage,
-        super(const ProfileInitial()) {
+    required this._getProfile,
+    required this._updateProfile,
+    required this._deactivateProfile,
+    required this._uploadProfileImage,
+    required this._deleteProfileImage,
+  }) : super(const ProfileInitial()) {
     on<ProfileFetchRequested>(_onFetch);
     on<ProfileUpdateRequested>(_onUpdate);
     on<ProfileDeactivateRequested>(_onDeactivate);
@@ -109,9 +104,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     try {
       await _uploadProfileImage(event.filePath);
-      final updatedProfile = currentProfile != null
-          ? currentProfile
-          : (await _getProfile());
+      final updatedProfile = currentProfile ?? await _getProfile();
       emit(ProfileSuccess(
         message: 'Profile image updated successfully',
         profile: updatedProfile,

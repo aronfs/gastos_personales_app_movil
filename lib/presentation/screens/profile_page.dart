@@ -222,7 +222,7 @@ class _ProfileViewState extends State<_ProfileView> {
                           spacing: 6,
                           runSpacing: 6,
                           children: profile.roles.map((role) {
-                            final label = role.length == role.toUpperCase()
+                            final label = role == role.toUpperCase()
                                 ? role[0] + role.substring(1).toLowerCase()
                                 : role;
                             return Container(

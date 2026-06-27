@@ -19,9 +19,9 @@ class InitialsAvatar extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withOpacity(0.18),
+        color: Colors.white.withValues(alpha: 0.18),
         border: Border.all(
-          color: Colors.white.withOpacity(0.35),
+          color: Colors.white.withValues(alpha: 0.35),
           width: 1.5,
         ),
       ),

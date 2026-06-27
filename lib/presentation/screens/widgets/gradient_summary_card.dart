@@ -30,7 +30,7 @@ class GradientSummaryCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: gradientColors.last.withOpacity(0.25),
+            color: gradientColors.last.withValues(alpha: 0.25),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -43,7 +43,7 @@ class GradientSummaryCard extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -62,7 +62,7 @@ class GradientSummaryCard extends StatelessWidget {
               deltaLabel!,
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontWeight: FontWeight.w500,
               ),
             ),

@@ -36,7 +36,7 @@ class ProfileHeaderCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2962FF).withOpacity(0.25),
+            color: const Color(0xFF2962FF).withValues(alpha: 0.25),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -58,7 +58,7 @@ class ProfileHeaderCard extends StatelessWidget {
           Text(
             email,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.85),
+              color: Colors.white.withValues(alpha: 0.85),
               fontSize: 13.5,
               fontWeight: FontWeight.w400,
             ),

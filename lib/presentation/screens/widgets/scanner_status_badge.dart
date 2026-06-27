@@ -49,7 +49,7 @@ class _ScannerStatusBadgeState extends State<ScannerStatusBadge>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E2235).withOpacity(0.85),
+        color: const Color(0xFF1E2235).withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

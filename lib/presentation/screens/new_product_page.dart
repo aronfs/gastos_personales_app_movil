@@ -43,12 +43,12 @@ class _NewProductPageState extends State<NewProductPage> {
 
   Future<void> _loadCategories() async {
     try {
-      print('Loading categories in NewProductPage...');
+      debugPrint('Loading categories in NewProductPage...');
       final categories = await GetCategories(
         CategoriesRepositoryImpl(CategoriesApiImpl()),
       )(type: CategoryType.expense);
       
-      print('Loaded categories count: ${categories.length}');
+      debugPrint('Loaded categories count: ${categories.length}');
 
       Category? selected;
       if (categories.isNotEmpty) {
@@ -56,7 +56,7 @@ class _NewProductPageState extends State<NewProductPage> {
           (c) => c.name.toLowerCase().contains('supermercado'),
           orElse: () => categories.first,
         );
-        print('Selected category: ${selected.name}');
+        debugPrint('Selected category: ${selected.name}');
       }
 
       if (mounted) {
@@ -67,8 +67,8 @@ class _NewProductPageState extends State<NewProductPage> {
         });
       }
     } catch (e, stackTrace) {
-      print('Error loading categories: $e');
-      print(stackTrace);
+      debugPrint('Error loading categories: $e');
+      debugPrint(stackTrace.toString());
       if (mounted) setState(() => _loadingCategories = false);
     }
   }

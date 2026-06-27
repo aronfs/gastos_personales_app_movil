@@ -21,7 +21,7 @@ class ApiEndpoints {
 
   //supermarket
   static final String product = '$baseUrl/products'; //Only POST
-  static final String expenses_supermarket = '$baseUrl/expenses/supermarket'; //Only Post
+  static final String expensesSupermarket = '$baseUrl/expenses/supermarket'; //Only Post
 
   //Reportes
   static final String reportsMonth = '$baseUrl/reports/monthly';

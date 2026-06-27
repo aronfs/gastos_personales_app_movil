@@ -60,7 +60,7 @@ class ExpensesApiImpl implements ExpensesApi {
   Future<Movement> createSupermarketExpense(Map<String, dynamic> body) async {
     try {
       final response = await _dio.post(
-        ApiEndpoints.expenses_supermarket,
+        ApiEndpoints.expensesSupermarket,
         data: body,
         options: Options(headers: await _headers()),
       );

@@ -26,7 +26,7 @@ class AmountHeader extends StatelessWidget {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: amountColor.withOpacity(0.7),
+            color: amountColor.withValues(alpha: 0.7),
             letterSpacing: 0.5,
           ),
         ),

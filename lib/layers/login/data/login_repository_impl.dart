@@ -4,7 +4,7 @@ import 'package:gastos_personales/layers/login/domain/repository/login_repositor
 class LoginRepositoryImpl implements LoginRepository {
   final Api _api;
 
-  LoginRepositoryImpl({required Api api}) : _api = api;
+  LoginRepositoryImpl({required this._api});
 
   @override
   Future<String> login(String username, String password) =>
