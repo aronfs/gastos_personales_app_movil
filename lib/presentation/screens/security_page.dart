@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastos_personales/data/repositories/auth_repository.dart';
 import 'package:gastos_personales/presentation/screens/change_password_page.dart';
 import 'package:gastos_personales/presentation/screens/widgets/active_session_row.dart';
 import 'package:gastos_personales/presentation/screens/widgets/destructive_action_button.dart';
@@ -7,7 +8,8 @@ import 'package:gastos_personales/presentation/screens/widgets/settings_group_ca
 import 'package:gastos_personales/presentation/screens/widgets/settings_navigation_row.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_section_header.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_switch_row.dart';
-
+import 'package:gastos_personales/util/biometric_service.dart';
+import 'package:gastos_personales/util/token_storage.dart';
 
 class SecurityPage extends StatefulWidget {
   const SecurityPage({super.key});
@@ -17,8 +19,76 @@ class SecurityPage extends StatefulWidget {
 }
 
 class _SecurityPageState extends State<SecurityPage> {
-  bool _biometricAccess = true;
+  bool _biometricAccess = false;
   bool _smsTwoFactor = false;
+  bool _loadingBiometric = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricState();
+  }
+
+  Future<void> _loadBiometricState() async {
+    final enabled = await TokenStorage.isBiometricEnabled();
+    if (mounted) {
+      setState(() {
+        _biometricAccess = enabled;
+        _loadingBiometric = false;
+      });
+    }
+  }
+
+  Future<void> _toggleBiometric(bool value) async {
+    if (value) {
+      try {
+        final authRepo = AuthRepository();
+        await authRepo.enableBiometric();
+        if (mounted) setState(() => _biometricAccess = true);
+      } catch (e) {
+        if (!mounted) return;
+        if (e is BiometricException &&
+            (e.code == 'NotAvailable' || e.code == 'NotEnrolled')) {
+          await _showEnrollBiometricDialog(context);
+          return;
+        }
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+          );
+      }
+    } else {
+      await TokenStorage.setBiometricEnabled(false);
+      if (mounted) setState(() => _biometricAccess = false);
+    }
+  }
+
+  Future<void> _showEnrollBiometricDialog(BuildContext context) async {
+    final goToSettings = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Registrar huella digital'),
+        content: const Text(
+          'No hay huellas registradas en el dispositivo. '
+          'Ve a Ajustes > Seguridad y registra una huella para usar esta función.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Ir a Ajustes'),
+          ),
+        ],
+      ),
+    );
+    if (goToSettings == true && mounted) {
+      await BiometricService.openBiometricSettings();
+    }
+  }
 
   void _handleCloseAllSessions() {
     showDialog(
@@ -73,7 +143,11 @@ class _SecurityPageState extends State<SecurityPage> {
                   icon: Icons.fingerprint,
                   title: 'Acceso biométrico',
                   value: _biometricAccess,
-                  onChanged: (v) => setState(() => _biometricAccess = v),
+                  onChanged: _loadingBiometric
+                      ? (_) {}
+                      : (v) {
+                          _toggleBiometric(v);
+                        },
                 ),
                 SettingsSwitchRow(
                   icon: Icons.shield_outlined,

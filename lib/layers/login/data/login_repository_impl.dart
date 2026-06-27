@@ -1,3 +1,4 @@
+import 'package:gastos_personales/layers/login/data/dto/login_response.dart';
 import 'package:gastos_personales/layers/login/data/source/network/api.dart';
 import 'package:gastos_personales/layers/login/domain/repository/login_repository.dart';
 
@@ -7,6 +8,6 @@ class LoginRepositoryImpl implements LoginRepository {
   LoginRepositoryImpl({required this._api});
 
   @override
-  Future<String> login(String username, String password) =>
+  Future<LoginResponse> login(String username, String password) =>
       _api.login(username, password);
 }

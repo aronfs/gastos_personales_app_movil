@@ -13,9 +13,10 @@ import 'package:gastos_personales/presentation/screens/bloc/profile/profile_bloc
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_event.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_state.dart';
 import 'package:gastos_personales/presentation/screens/edit_profile_page.dart';
+import 'package:gastos_personales/navigation/route.dart';
 import 'package:gastos_personales/presentation/screens/widgets/deactivate_account_dialog.dart';
 import 'package:gastos_personales/presentation/screens/widgets/profile_avatar.dart';
-
+import 'package:gastos_personales/util/token_storage.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -56,7 +57,9 @@ class _ProfileViewState extends State<_ProfileView> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Delete profile image'),
-        content: const Text('Are you sure you want to delete your profile photo?'),
+        content: const Text(
+          'Are you sure you want to delete your profile photo?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -137,10 +140,10 @@ class _ProfileViewState extends State<_ProfileView> {
         final profile = state is ProfileLoaded
             ? state.profile
             : (state is ProfileOperationLoading
-                ? state.profile
-                : (state is ProfileSuccess
-                    ? state.profile
-                    : (state is ProfileError ? state.profile : null)));
+                  ? state.profile
+                  : (state is ProfileSuccess
+                        ? state.profile
+                        : (state is ProfileError ? state.profile : null)));
 
         if (profile == null) {
           return const Scaffold(
@@ -151,11 +154,11 @@ class _ProfileViewState extends State<_ProfileView> {
         final isOperationLoading = state is ProfileOperationLoading;
         final initials = profile.fullName.isNotEmpty
             ? profile.fullName
-                .split(' ')
-                .map((w) => w.isNotEmpty ? w[0] : '')
-                .take(2)
-                .join()
-                .toUpperCase()
+                  .split(' ')
+                  .map((w) => w.isNotEmpty ? w[0] : '')
+                  .take(2)
+                  .join()
+                  .toUpperCase()
             : '?';
 
         return Scaffold(
@@ -166,7 +169,10 @@ class _ProfileViewState extends State<_ProfileView> {
                 // ── Profile header card ──────────────────────────────
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 36,
+                    horizontal: 24,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(28),
                     gradient: const LinearGradient(
@@ -203,9 +209,7 @@ class _ProfileViewState extends State<_ProfileView> {
                       // Name
                       Text(
                         profile.fullName,
-                        style: tt.headlineLarge?.copyWith(
-                          color: cs.surface,
-                        ),
+                        style: tt.headlineLarge?.copyWith(color: cs.surface),
                       ),
                       const SizedBox(height: 4),
                       // Email
@@ -338,17 +342,35 @@ class _ProfileViewState extends State<_ProfileView> {
                   onTap: isOperationLoading
                       ? null
                       : () => showDialog(
-                            context: context,
-                            builder: (_) => DeactivateAccountDialog(
-                              onConfirm: () {
-                                context.read<ProfileBloc>().add(
-                                  const ProfileDeactivateRequested(
-                                    confirmation: 'DEACTIVATE',
-                                  ),
-                                );
-                              },
-                            ),
+                          context: context,
+                          builder: (_) => DeactivateAccountDialog(
+                            onConfirm: () {
+                              context.read<ProfileBloc>().add(
+                                const ProfileDeactivateRequested(
+                                  confirmation: 'DEACTIVATE',
+                                ),
+                              );
+                            },
                           ),
+                        ),
+                ),
+                const SizedBox(height: 10),
+                _ActionButton(
+                  icon: Icons.logout,
+                  label: 'Cerrar sesión',
+                  textColor: cs.error,
+                  onTap: () async {
+                    await TokenStorage.clearSession(
+                      preserveBiometricLogin: true,
+                    );
+                    if (context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        signin,
+                        (_) => false,
+                      );
+                    }
+                  },
                 ),
               ],
             ),

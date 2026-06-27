@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:gastos_personales/ui.theme/design_tokens.dart';
 import 'package:gastos_personales/ui.theme/styles/text_style_app.dart';
 
 class HintLabel extends StatelessWidget {
@@ -13,21 +14,13 @@ class HintLabel extends StatelessWidget {
   });
 
   void onTap(String toPage, BuildContext context) {
-    // Lógica para manejar el tap en label2
     Navigator.pushNamed(context, toPage);
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
     return Padding(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.height * 0.3,
-        bottom: screenHeight * 0.02,
-        left: screenWidth * 0.05,
-        right: screenWidth * 0.05,
-      ),
+      padding: EdgeInsets.only(top: Spacing.lg),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

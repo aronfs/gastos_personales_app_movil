@@ -20,12 +20,15 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
   ) async {
     emit(const SignInLoading());
     try {
-      final accesstoken = await loginRepository.login(
+      final response = await loginRepository.login(
         event.email,
         event.password,
       );
-      await TokenStorage.saveToken(accesstoken);
-      emit(SignInSuccess(accesstoken: accesstoken));
+      await TokenStorage.saveToken(response.accessToken);
+      await TokenStorage.saveRefreshToken(response.refreshToken);
+      await TokenStorage.saveUserId(response.userId);
+      await TokenStorage.saveSessionId(response.sessionId);
+      emit(SignInSuccess(accesstoken: response.accessToken));
     } catch (e) {
       emit(SignInFailure(error: _parseError(e)));
     }

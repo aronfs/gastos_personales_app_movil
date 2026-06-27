@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Se requiere acceso a la cámara para escanear cenefas y códigos de productos.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Usa tu huella o Face ID para acceder rápidamente sin contraseña</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

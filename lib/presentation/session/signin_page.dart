@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gastos_personales/data/repositories/auth_repository.dart';
 import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/categories/data/categories_repository_impl.dart';
 import 'package:gastos_personales/layers/categories/data/source/network/categories_api.dart';
@@ -15,6 +16,8 @@ import 'package:gastos_personales/presentation/session/bloc/sign_in/sign_in_bloc
 import 'package:gastos_personales/presentation/session/widgets/hint_label.dart';
 import 'package:gastos_personales/presentation/session/widgets/label_form.dart';
 import 'package:gastos_personales/presentation/session/widgets/text_forms.dart';
+import 'package:gastos_personales/util/biometric_service.dart';
+import 'package:gastos_personales/util/token_storage.dart';
 
 /// Provee el [SignInBloc] y monta la pantalla.
 class SigninPage extends StatelessWidget {
@@ -41,6 +44,29 @@ class _SigninViewState extends State<_SigninView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isObscure = true;
+  bool _biometricEnabled = false;
+  bool _biometricChecking = true;
+  bool _biometricAuthenticating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometric();
+  }
+
+  Future<void> _checkBiometric() async {
+    final enabled = await TokenStorage.isBiometricEnabled();
+    final hasRefreshToken = await TokenStorage.hasRefreshToken();
+    if (enabled && !hasRefreshToken) {
+      await TokenStorage.setBiometricEnabled(false);
+    }
+    if (mounted) {
+      setState(() {
+        _biometricEnabled = enabled && hasRefreshToken;
+        _biometricChecking = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -59,6 +85,118 @@ class _SigninViewState extends State<_SigninView> {
     context.read<SignInBloc>().add(
       SignInRequested(email: email, password: password),
     );
+  }
+
+  Future<void> _signInWithBiometric(BuildContext context) async {
+    if (_biometricAuthenticating) return;
+    setState(() => _biometricAuthenticating = true);
+    try {
+      final authRepo = AuthRepository();
+      await authRepo.loginWithBiometric();
+      if (!mounted) return;
+      if (context.mounted) {
+        await _checkAndNavigateInitialSetup(context);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      if (e is BiometricException &&
+          (e.code == 'NotAvailable' || e.code == 'NotEnrolled')) {
+        await _showEnrollBiometricDialog(context);
+        return;
+      }
+      await _checkBiometric();
+      final msg = e.toString().replaceAll('Exception: ', '');
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(msg)));
+    } finally {
+      if (mounted) {
+        setState(() => _biometricAuthenticating = false);
+      }
+    }
+  }
+
+  Future<void> _showEnrollBiometricDialog(BuildContext context) async {
+    final goToSettings = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Registrar huella digital'),
+        content: const Text(
+          'No hay huellas registradas en el dispositivo. '
+          'Ve a Ajustes > Seguridad y registra una huella para usar esta función.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Ir a Ajustes'),
+          ),
+        ],
+      ),
+    );
+    if (goToSettings == true && mounted) {
+      await BiometricService.openBiometricSettings();
+    }
+  }
+
+  Future<void> _onLoginSuccess(BuildContext context) async {
+    if (!_biometricEnabled && mounted) {
+      final accept = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('¿Activar huella digital?'),
+          content: const Text(
+            'Puedes usar tu huella digital para iniciar sesión más rápido sin contraseña.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Ahora no'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Activar'),
+            ),
+          ],
+        ),
+      );
+      if (accept == true && mounted) {
+        try {
+          final authRepo = AuthRepository();
+          await authRepo.enableBiometric();
+          if (mounted) {
+            setState(() => _biometricEnabled = true);
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(
+                  content: Text('Huella digital activada correctamente'),
+                ),
+              );
+          }
+        } catch (e) {
+          if (!mounted) return;
+          if (e is BiometricException &&
+              (e.code == 'NotAvailable' || e.code == 'NotEnrolled')) {
+            await _showEnrollBiometricDialog(context);
+          } else {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(e.toString().replaceAll('Exception: ', '')),
+                ),
+              );
+          }
+        }
+      }
+    }
+    if (mounted) {
+      _checkAndNavigateInitialSetup(context);
+    }
   }
 
   Future<void> _checkAndNavigateInitialSetup(BuildContext context) async {
@@ -88,7 +226,7 @@ class _SigninViewState extends State<_SigninView> {
     return BlocListener<SignInBloc, SignInState>(
       listener: (context, state) {
         if (state is SignInSuccess) {
-          _checkAndNavigateInitialSetup(context);
+          _onLoginSuccess(context);
         } else if (state is SignInFailure) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
@@ -144,7 +282,7 @@ class _SigninViewState extends State<_SigninView> {
                       hintText: loc.hintEmail,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
                   // ── Password ──────────────────────────────────────
                   LabelForm(label: loc.labelpassword),
@@ -170,14 +308,14 @@ class _SigninViewState extends State<_SigninView> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
                   // ── Forgot password ─────────────────────────────
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Text(
-                      loc.labelforgotpassword,
-                      style: TextStyle(color: cs.primary),
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text(loc.labelforgotpassword),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -190,21 +328,49 @@ class _SigninViewState extends State<_SigninView> {
                         curr is SignInFailure,
                     builder: (context, state) {
                       final isLoading = state is SignInLoading;
-                      return ElevatedButton(
-                        onPressed: isLoading ? null : () => _submit(context),
-                        child: isLoading
+                      return SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : () => _submit(context),
+                          child: isLoading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: cs.onPrimary,
+                                  ),
+                                )
+                              : Text(loc.btnsignin),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ── Biometric button ────────────────────────────
+                  if (!_biometricChecking && _biometricEnabled) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _biometricAuthenticating
+                            ? null
+                            : () => _signInWithBiometric(context),
+                        icon: _biometricAuthenticating
                             ? SizedBox(
-                                width: 20,
-                                height: 20,
+                                width: 18,
+                                height: 18,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   color: cs.onPrimary,
                                 ),
                               )
-                            : Text(loc.btnsignin),
-                      );
-                    },
-                  ),
+                            : const Icon(Icons.fingerprint),
+                        label: const Text('Entrar con huella'),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   // ── Hint: No account? ──────────────────────
                   HintLabel(

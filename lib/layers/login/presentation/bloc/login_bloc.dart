@@ -22,9 +22,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) async {
     emit(const LoginLoading());
     try {
-      final token = await _signIn(event.email, event.password);
-      await TokenStorage.saveToken(token);
-      emit(LoginSuccess(token));
+      final response = await _signIn(event.email, event.password);
+      await TokenStorage.saveToken(response.accessToken);
+      await TokenStorage.saveRefreshToken(response.refreshToken);
+      await TokenStorage.saveUserId(response.userId);
+      await TokenStorage.saveSessionId(response.sessionId);
+      emit(LoginSuccess(response.accessToken));
     } catch (e) {
       debugPrint(e.toString());
       emit(LoginFailure(_parseError(e)));

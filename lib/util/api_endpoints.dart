@@ -28,6 +28,9 @@ class ApiEndpoints {
   static final String reportsYear = '$baseUrl/reports/yearly';
   static final String reportsCategories = '$baseUrl/reports/categories';
 
+  //Auth
+  static final String authRefresh = '$baseUrl/auth/refresh';
+
   //Profile
   static final String profile = '$baseUrl/profile';
   static final String profileDeactivate = '$baseUrl/profile/deactivate';

@@ -4,6 +4,7 @@ import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/navigation/route.dart';
 import 'package:gastos_personales/ui.theme/styles/text_style_app.dart';
 import 'package:gastos_personales/ui.theme/theme_app.dart';
+import 'package:gastos_personales/util/token_storage.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -59,8 +60,24 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushNamed(context, signin);
-    });
+    _checkSession();
+  }
+
+  Future<void> _checkSession() async {
+    await Future.delayed(const Duration(seconds: 3));
+    if (!mounted) return;
+
+    final hasBiometric = await TokenStorage.isBiometricEnabled();
+    final hasToken = await TokenStorage.hasToken();
+
+    if (!mounted) return;
+
+    if (hasBiometric) {
+      Navigator.pushReplacementNamed(context, signin);
+    } else if (hasToken) {
+      Navigator.pushReplacementNamed(context, home);
+    } else {
+      Navigator.pushReplacementNamed(context, signin);
+    }
   }
 }

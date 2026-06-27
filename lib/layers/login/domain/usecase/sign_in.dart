@@ -1,3 +1,4 @@
+import 'package:gastos_personales/layers/login/data/dto/login_response.dart';
 import 'package:gastos_personales/layers/login/domain/repository/login_repository.dart';
 
 class SignIn {
@@ -5,7 +6,7 @@ class SignIn {
 
   final LoginRepository _repository;
 
-  Future<String> call(String email, String password) async {
-    return await _repository.login(email, password);
+  Future<LoginResponse> call(String email, String password) async {
+    return _repository.login(email, password);
   }
 }
