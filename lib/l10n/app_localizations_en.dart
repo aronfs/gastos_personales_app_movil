@@ -132,7 +132,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signIn => 'Sign In';
 
   @override
-  String get lastName => 'Last Name';
+  String get lastName => 'Last name';
 
   @override
   String get hintLastName => 'Your last name';
@@ -899,4 +899,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get english => 'English';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get confirmDeleteImage => 'Remove photo?';
+
+  @override
+  String get confirmDeleteImageHint => 'This action cannot be undone';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get confirmLogout => 'Sign out?';
+
+  @override
+  String get confirmLogoutHint => 'You will be redirected to the login screen';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get dangerZone => 'Danger zone';
+
+  @override
+  String get personalInfo => 'Personal info';
+
+  @override
+  String get firstName => 'First name';
 }

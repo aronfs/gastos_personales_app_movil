@@ -344,7 +344,7 @@ abstract class AppLocalizations {
   /// No description provided for @lastName.
   ///
   /// In en, this message translates to:
-  /// **'Last Name'**
+  /// **'Last name'**
   String get lastName;
 
   /// No description provided for @hintLastName.
@@ -1822,6 +1822,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get english;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @confirmDeleteImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo?'**
+  String get confirmDeleteImage;
+
+  /// No description provided for @confirmDeleteImageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone'**
+  String get confirmDeleteImageHint;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @confirmLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out?'**
+  String get confirmLogout;
+
+  /// No description provided for @confirmLogoutHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You will be redirected to the login screen'**
+  String get confirmLogoutHint;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @dangerZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger zone'**
+  String get dangerZone;
+
+  /// No description provided for @personalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal info'**
+  String get personalInfo;
+
+  /// No description provided for @firstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get firstName;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

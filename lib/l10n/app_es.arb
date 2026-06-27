@@ -287,5 +287,17 @@
     "reportCardTransactions": "{count} transacciones en {month}",
     "selectLanguage": "Seleccionar idioma",
     "spanish": "Español",
-    "english": "English"
+    "english": "English",
+    "camera": "Cámara",
+    "gallery": "Galería",
+    "confirmDeleteImage": "¿Eliminar foto?",
+    "confirmDeleteImageHint": "Esta acción no se puede deshacer",
+    "confirm": "Confirmar",
+    "confirmLogout": "¿Cerrar sesión?",
+    "confirmLogoutHint": "Serás redirigido a la pantalla de inicio",
+    "account": "Cuenta",
+    "dangerZone": "Zona de peligro",
+    "personalInfo": "Información personal",
+    "firstName": "Nombre",
+    "lastName": "Apellido"
 }

@@ -899,4 +899,37 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get english => 'English';
+
+  @override
+  String get camera => 'Cámara';
+
+  @override
+  String get gallery => 'Galería';
+
+  @override
+  String get confirmDeleteImage => '¿Eliminar foto?';
+
+  @override
+  String get confirmDeleteImageHint => 'Esta acción no se puede deshacer';
+
+  @override
+  String get confirm => 'Confirmar';
+
+  @override
+  String get confirmLogout => '¿Cerrar sesión?';
+
+  @override
+  String get confirmLogoutHint => 'Serás redirigido a la pantalla de inicio';
+
+  @override
+  String get account => 'Cuenta';
+
+  @override
+  String get dangerZone => 'Zona de peligro';
+
+  @override
+  String get personalInfo => 'Información personal';
+
+  @override
+  String get firstName => 'Nombre';
 }

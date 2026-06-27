@@ -289,5 +289,17 @@
     "reportCardTransactions": "{count} transactions in {month}",
     "selectLanguage": "Select language",
     "spanish": "Spanish",
-    "english": "English"
+    "english": "English",
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "confirmDeleteImage": "Remove photo?",
+    "confirmDeleteImageHint": "This action cannot be undone",
+    "confirm": "Confirm",
+    "confirmLogout": "Sign out?",
+    "confirmLogoutHint": "You will be redirected to the login screen",
+    "account": "Account",
+    "dangerZone": "Danger zone",
+    "personalInfo": "Personal info",
+    "firstName": "First name",
+    "lastName": "Last name"
 }
