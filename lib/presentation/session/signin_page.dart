@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gastos_personales/l10n/app_localizations.dart';
+import 'package:gastos_personales/layers/categories/data/categories_repository_impl.dart';
+import 'package:gastos_personales/layers/categories/data/source/network/categories_api.dart';
+import 'package:gastos_personales/layers/categories/domain/usecase/check_initial_setup_required.dart';
+import 'package:gastos_personales/layers/dashboard/data/dashboard_repository_impl.dart';
+import 'package:gastos_personales/layers/dashboard/data/source/network/dashboard_api.dart';
+import 'package:gastos_personales/layers/dashboard/domain/usecase/get_dashboard.dart';
 import 'package:gastos_personales/layers/login/data/login_repository_impl.dart';
 import 'package:gastos_personales/layers/login/data/source/network/api.dart';
 import 'package:gastos_personales/navigation/route.dart';
@@ -9,7 +15,6 @@ import 'package:gastos_personales/presentation/session/bloc/sign_in/sign_in_bloc
 import 'package:gastos_personales/presentation/session/widgets/hint_label.dart';
 import 'package:gastos_personales/presentation/session/widgets/label_form.dart';
 import 'package:gastos_personales/presentation/session/widgets/text_forms.dart';
-import 'package:gastos_personales/ui.theme/size_app.dart';
 
 /// Provee el [SignInBloc] y monta la pantalla.
 class SigninPage extends StatelessWidget {
@@ -56,6 +61,25 @@ class _SigninViewState extends State<_SigninView> {
     );
   }
 
+  Future<void> _checkAndNavigateInitialSetup(BuildContext context) async {
+    final categoriesRepo = CategoriesRepositoryImpl(CategoriesApiImpl());
+    final dashboardRepo = DashboardRepositoryImpl(DashboardApiImpl());
+    final checkUseCase = CheckInitialSetupRequired(
+      categoriesRepo,
+      GetDashboard(dashboardRepo),
+    );
+
+    final needsSetup = await checkUseCase();
+
+    if (!context.mounted) return;
+
+    if (needsSetup) {
+      Navigator.pushNamedAndRemoveUntil(context, initialSetup, (_) => false);
+    } else {
+      Navigator.pushNamedAndRemoveUntil(context, home, (_) => false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -64,7 +88,7 @@ class _SigninViewState extends State<_SigninView> {
     return BlocListener<SignInBloc, SignInState>(
       listener: (context, state) {
         if (state is SignInSuccess) {
-          Navigator.pushNamedAndRemoveUntil(context, home, (_) => false);
+          _checkAndNavigateInitialSetup(context);
         } else if (state is SignInFailure) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
@@ -166,22 +190,18 @@ class _SigninViewState extends State<_SigninView> {
                         curr is SignInFailure,
                     builder: (context, state) {
                       final isLoading = state is SignInLoading;
-                      return SizedBox(
-                        width: double.infinity,
-                        height: sizeButton.height,
-                        child: ElevatedButton(
-                          onPressed: isLoading ? null : () => _submit(context),
-                          child: isLoading
-                              ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: cs.onPrimary,
-                                  ),
-                                )
-                              : Text(loc.btnsignin),
-                        ),
+                      return ElevatedButton(
+                        onPressed: isLoading ? null : () => _submit(context),
+                        child: isLoading
+                            ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: cs.onPrimary,
+                                ),
+                              )
+                            : Text(loc.btnsignin),
                       );
                     },
                   ),

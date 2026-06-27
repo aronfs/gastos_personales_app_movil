@@ -7,10 +7,13 @@ import 'package:gastos_personales/presentation/screens/income_page.dart';
 import 'package:gastos_personales/presentation/screens/new_expense_page.dart';
 import 'package:gastos_personales/presentation/screens/new_income_page.dart';
 import 'package:gastos_personales/presentation/screens/new_product_page.dart';
+import 'package:gastos_personales/presentation/screens/quick_actions_page.dart';
+import 'package:gastos_personales/presentation/screens/receipt_list_page.dart';
 import 'package:gastos_personales/presentation/screens/scan_barcode_page.dart';
 import 'package:gastos_personales/presentation/screens/settings_page.dart';
 import 'package:gastos_personales/presentation/screens/supermarket_expense_page.dart';
 import 'package:gastos_personales/presentation/screens/widgets/expenses_page.dart';
+import 'package:gastos_personales/presentation/session/initial_setup_page.dart';
 import 'package:gastos_personales/presentation/session/signin_page.dart';
 import 'package:gastos_personales/presentation/session/signup_page.dart';
 import 'package:gastos_personales/presentation/splash/splash_page.dart';
@@ -53,6 +56,11 @@ class RouteGenerator {
           settings: routeSettings,
           builder: (_) => const CategoriesPage(),
         );
+      case initialSetup:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const InitialSetupPage(),
+        );
       case newExpense:
         final expense = routeSettings.arguments as Movement?;
         return MaterialPageRoute(
@@ -84,6 +92,16 @@ class RouteGenerator {
         return MaterialPageRoute(
           settings: routeSettings,
           builder: (_) => const ScanBarcodePage(),
+        );
+      case receiptScanner:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const ReceiptListPage(),
+        );
+      case quickActions:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const QuickActionsPage(),
         );
       default:
         return _errorRoute();

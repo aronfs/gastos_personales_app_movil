@@ -20,19 +20,18 @@ const _iconNames = [
   'subscription', 'tax', 'bank', 'transfer', 'savings', 'wallet', 'cash',
 ];
 
-class CategoryEditPage extends StatefulWidget {
-  final Category category;
-
-  const CategoryEditPage({super.key, required this.category});
+class CategoryCreatePage extends StatefulWidget {
+  const CategoryCreatePage({super.key});
 
   @override
-  State<CategoryEditPage> createState() => _CategoryEditPageState();
+  State<CategoryCreatePage> createState() => _CategoryCreatePageState();
 }
 
-class _CategoryEditPageState extends State<CategoryEditPage> {
-  late final TextEditingController _nameController;
-  late String _iconValue;
-  late String _colorValue;
+class _CategoryCreatePageState extends State<CategoryCreatePage> {
+  final _nameController = TextEditingController();
+  String _iconValue = 'restaurant';
+  String _colorValue = 'Azul';
+  CategoryType _selectedType = CategoryType.expense;
   final _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
   bool _hasSaved = false;
@@ -40,32 +39,23 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
   bool _showColors = false;
 
   @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.category.name);
-    _iconValue = widget.category.icon;
-    _colorValue = nameFromHex(widget.category.color);
-  }
-
-  @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
   }
 
-  Future<void> _onSave() async {
+  void _onSave() {
     if (!_formKey.currentState!.validate()) return;
     if (_isSaving || _hasSaved) return;
 
     setState(() => _isSaving = true);
 
-    if (!mounted) return;
     context.read<CategoriesBloc>().add(
-      CategoriesUpdateRequested(
-        id: widget.category.id,
+      CategoriesCreateRequested(
         name: _nameController.text.trim(),
         icon: _iconValue,
         color: hexFromName(_colorValue),
+        type: _selectedType,
       ),
     );
   }
@@ -76,12 +66,12 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
 
     return BlocListener<CategoriesBloc, CategoriesState>(
       listener: (context, state) {
-        if (state is CategoriesUpdateSuccess) {
+        if (state is CategoriesLoaded) {
           _hasSaved = true;
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Categoría actualizada correctamente.'),
+              content: Text('Categoría creada correctamente.'),
               backgroundColor: Color(0xFF43A047),
             ),
           );
@@ -106,7 +96,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Editar categoría'),
+          title: const Text('Nueva categoría'),
           centerTitle: true,
         ),
         body: SingleChildScrollView(
@@ -187,6 +177,29 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
                   sizeCurve: Curves.easeInOut,
                 ),
 
+                const SizedBox(height: 24),
+                DropdownButtonFormField<CategoryType>(
+                  value: _selectedType,
+                  decoration: const InputDecoration(
+                    labelText: 'Tipo',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: CategoryType.expense,
+                      child: Text('Gasto'),
+                    ),
+                    DropdownMenuItem(
+                      value: CategoryType.income,
+                      child: Text('Ingreso'),
+                    ),
+                  ],
+                  onChanged: _isSaving
+                      ? null
+                      : (value) {
+                          if (value != null) setState(() => _selectedType = value);
+                        },
+                ),
                 const SizedBox(height: 32),
                 FilledButton(
                   onPressed: _isSaving ? null : _onSave,
@@ -199,7 +212,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Guardar Cambios'),
+                      : const Text('Crear categoría'),
                 ),
               ],
             ),
@@ -210,7 +223,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
   }
 
   // ─────────────────────────────────────────────
-  //  Section header
+  //  Section header con tap para expandir/colapsar
   // ─────────────────────────────────────────────
 
   Widget _buildSectionHeader({
@@ -269,7 +282,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
   }
 
   // ─────────────────────────────────────────────
-  //  Vista previa compacta
+  //  Vista previa compacta (cuando está colapsado)
   // ─────────────────────────────────────────────
 
   Widget _buildIconPreview(ColorScheme cs) {

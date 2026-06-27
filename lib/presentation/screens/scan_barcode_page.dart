@@ -14,8 +14,8 @@ import 'package:gastos_personales/layers/products/data/products_repository_impl.
 import 'package:gastos_personales/layers/products/data/source/network/products_api.dart';
 import 'package:gastos_personales/layers/products/domain/usecase/create_product.dart';
 import 'package:gastos_personales/presentation/screens/bloc/product_form/product_form_bloc.dart';
+import 'package:gastos_personales/presentation/screens/scan_confirm_page.dart';
 
-import 'package:gastos_personales/layers/scanner/domain/entity/product_scan_result.dart';
 import 'package:gastos_personales/layers/scanner/domain/usecase/analyze_shelf_label_usecase.dart';
 import 'package:gastos_personales/presentation/screens/bloc/scanner/scanner_cubit.dart';
 import 'package:gastos_personales/presentation/screens/bloc/scanner/scanner_state.dart';
@@ -237,132 +237,6 @@ class _ScanOcrViewState extends State<_ScanOcrView> with WidgetsBindingObserver 
     }
   }
 
-  void _confirmProduct(ProductScanResult result) {
-    if (_supermercadoCategory == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cargando categoría... intenta de nuevo.')),
-      );
-      return;
-    }
-    context.read<ProductFormBloc>().add(
-      ProductFormSubmitRequested(
-        categoryId: _supermercadoCategory!.id,
-        name: result.name,
-        description: result.presentation.isNotEmpty ? result.presentation : 'Detectado por OCR',
-        unitPrice: result.price,
-      ),
-    );
-  }
-
-  void _showProductBottomSheet(BuildContext context, ProductScanResult result) {
-    final nameController = TextEditingController(text: result.name);
-    final priceController = TextEditingController(text: result.price.toStringAsFixed(2));
-    final presentationController = TextEditingController(text: result.presentation);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      isDismissible: false,
-      enableDrag: false,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return BlocConsumer<ProductFormBloc, ProductFormState>(
-          bloc: context.read<ProductFormBloc>(),
-          listener: (ctx, state) {
-            if (state is ProductFormSuccess) {
-              Navigator.pop(ctx); 
-              Navigator.pop(context, true); 
-            } else if (state is ProductFormFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
-            }
-          },
-          builder: (ctx, state) {
-            final isLoading = state is ProductFormLoading;
-            return SafeArea(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: 24.0, right: 24.0, top: 24.0, 
-                  bottom: MediaQuery.of(ctx).viewInsets.bottom + 24.0
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Confirmar Datos',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(labelText: 'Nombre del Producto', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: presentationController,
-                      decoration: const InputDecoration(labelText: 'Presentación', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: priceController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(labelText: 'Precio', prefixText: '\$ ', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: isLoading
-                                ? null
-                                : () {
-                                    Navigator.pop(ctx);
-                                    context.read<ScannerCubit>().resumeScanning();
-                                  },
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            child: const Text('Volver a intentar'),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: isLoading 
-                              ? null 
-                              : () {
-                                  final editedResult = result.copyWith(
-                                    name: nameController.text.trim(),
-                                    presentation: presentationController.text.trim(),
-                                    price: double.tryParse(priceController.text.trim()) ?? 0.0,
-                                  );
-                                  _confirmProduct(editedResult);
-                                },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueAccent,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            child: Text(isLoading ? 'Guardando...' : 'Guardar'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -385,7 +259,22 @@ class _ScanOcrViewState extends State<_ScanOcrView> with WidgetsBindingObserver 
             }
           } else if (state is ScannerProductDetected) {
             _stopCamera();
-            _showProductBottomSheet(context, state.result);
+            final categoryId = _supermercadoCategory?.id ?? '';
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ScanConfirmPage(
+                  scanResult: state.result,
+                  categoryId: categoryId,
+                ),
+              ),
+            ).then((value) {
+              if (value == true && mounted) {
+                Navigator.pop(context, true);
+              } else if (mounted) {
+                context.read<ScannerCubit>().resumeScanning();
+              }
+            });
           } else if (state is ScannerError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Error: ${state.message}')),

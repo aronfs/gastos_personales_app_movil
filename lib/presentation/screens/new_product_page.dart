@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gastos_personales/layers/categories/data/categories_repository_impl.dart';
 import 'package:gastos_personales/layers/categories/data/source/network/categories_api.dart';
@@ -118,32 +119,6 @@ class _NewProductPageState extends State<NewProductPage> {
       ),
     );
     if (picked != null) setState(() => _selectedCategory = picked);
-  }
-
-  Future<void> _editPrice() async {
-    final controller = TextEditingController(text: _priceController.text);
-    final saved = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Precio Unitario'),
-        content: TextField(
-          controller: controller,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(prefixText: '\$ '),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
-    );
-    if (saved == true) setState(() => _priceController.text = controller.text);
   }
 
   void _rebuild() => setState(() {});
@@ -267,13 +242,42 @@ class _NewProductPageState extends State<NewProductPage> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            InlineInputField(
-                              icon: Icons.attach_money,
-                              iconColor: const Color(0xFF2E9E4F),
-                              value: _priceController.text.isEmpty
-                                  ? '0.00'
-                                  : _priceController.text,
-                              onTap: loading ? null : _editPrice,
+                            Material(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: const Color(0xFFEEF0F4), width: 1),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.attach_money, size: 16, color: Color(0xFF2E9E4F)),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _priceController,
+                                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                                        ],
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF1A1A2E),
+                                        ),
+                                        decoration: const InputDecoration(
+                                          hintText: '0.00',
+                                          border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.symmetric(vertical: 10),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),

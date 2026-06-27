@@ -18,6 +18,7 @@ import 'package:gastos_personales/presentation/screens/bloc/supermarket_form/sup
 import 'package:gastos_personales/presentation/screens/widgets/amount_header.dart';
 import 'package:gastos_personales/presentation/screens/widgets/cart_product_row.dart';
 import 'package:gastos_personales/presentation/screens/widgets/form_field_row.dart';
+import 'package:gastos_personales/presentation/screens/widgets/inline_editable_field_row.dart';
 import 'package:gastos_personales/presentation/screens/widgets/primary_action_button.dart';
 import 'package:gastos_personales/presentation/screens/widgets/section_header_with_action.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_app_bar.dart';
@@ -152,35 +153,6 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView> {
     }
   }
 
-  void _editDescription(BuildContext context) async {
-    final controller = TextEditingController(text: _descController.text);
-    final saved = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Descripción'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'Compra Supermaxi'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
-    );
-    if (saved == true) {
-      setState(() {
-        _descController.text = controller.text;
-      });
-    }
-  }
-
   void _submit(BuildContext context) {
     if (_descController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -272,13 +244,14 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView> {
                   onTap: () {},
                 ),
                 const SizedBox(height: 12),
-                FormFieldRow(
+                InlineEditableFieldRow(
                   icon: Icons.description_outlined,
                   iconBackgroundColor: const Color(0xFFD7F2EC),
                   iconColor: const Color(0xFF1FAE8E),
                   label: 'Descripción',
-                  value: _descController.text.isEmpty ? 'Ninguna' : _descController.text,
-                  onTap: isLoading ? () {} : () => _editDescription(context),
+                  controller: _descController,
+                  hintText: 'Compra Supermaxi',
+                  enabled: !isLoading,
                 ),
                 const SizedBox(height: 24),
                 SectionHeaderWithAction(

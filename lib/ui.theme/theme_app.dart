@@ -41,7 +41,7 @@ class AppTheme {
             horizontal: Spacing.md,
             vertical: Spacing.sm,
           ),
-          minimumSize: Size(double.infinity, TouchTarget.minSize),
+          minimumSize: Size(double.infinity, 56),
           shape: RoundedRectangleBorder(
             borderRadius: RadiusTokens.lg,
           ),

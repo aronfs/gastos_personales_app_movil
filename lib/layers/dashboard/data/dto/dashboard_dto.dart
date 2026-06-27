@@ -33,15 +33,25 @@ class DashboardSummaryDto extends DashboardSummary {
 
   factory DashboardSummaryDto.fromMap(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>;
-    final catSummary = data['categorySummary'] as Map<String, dynamic>;
 
-    final incomeList = (catSummary['income'] as List)
-        .map((e) => CategoryItemDto.fromMap(e as Map<String, dynamic>))
-        .toList();
+    final List<CategoryItem> incomeList;
+    final List<CategoryItem> expenseList;
 
-    final expenseList = (catSummary['expense'] as List)
-        .map((e) => CategoryItemDto.fromMap(e as Map<String, dynamic>))
-        .toList();
+    final catSummary = data['categorySummary'];
+    if (catSummary != null) {
+      final catMap = catSummary as Map<String, dynamic>;
+      incomeList = (catMap['income'] as List?)
+              ?.map((e) => CategoryItemDto.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [];
+      expenseList = (catMap['expense'] as List?)
+              ?.map((e) => CategoryItemDto.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [];
+    } else {
+      incomeList = [];
+      expenseList = [];
+    }
 
     return DashboardSummaryDto(
       totalIncome: (data['totalIncome'] as num).toDouble(),

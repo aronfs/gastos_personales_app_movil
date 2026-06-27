@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/navigation/route.dart';
 import 'package:gastos_personales/presentation/session/widgets/label_form.dart';
-import 'package:gastos_personales/ui.theme/size_app.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -175,22 +174,18 @@ class _SignupPageState extends State<SignupPage> {
                 const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.only(left: 35, right: 35),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: sizeButton.height,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _handleSignup,
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                            : Text(appLocalizations.btnsignup),
-                    ),
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _handleSignup,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(appLocalizations.btnsignup),
                   ),
                 ),
                 const SizedBox(height: 100),
