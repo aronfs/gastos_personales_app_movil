@@ -57,6 +57,7 @@ class _ProfileViewState extends State<_ProfileView>
   late final List<Animation<double>> _itemAnimations;
   final _scrollController = ScrollController();
   final _picker = ImagePicker();
+  final _editSectionKey = GlobalKey();
 
   bool _isEditing = false;
   bool _showDeleteConfirm = false;
@@ -114,7 +115,8 @@ class _ProfileViewState extends State<_ProfileView>
     final firstName = _firstNameCtrl.text;
     final lastName = _lastNameCtrl.text;
     final profile = _currentProfile();
-    final changed = profile != null &&
+    final changed =
+        profile != null &&
         (firstName != profile.firstName || lastName != profile.lastName);
     if (changed != _hasChanges) {
       setState(() => _hasChanges = changed);
@@ -149,6 +151,27 @@ class _ProfileViewState extends State<_ProfileView>
         _firstNameCtrl.text = profile.firstName;
         _lastNameCtrl.text = profile.lastName;
       }
+    });
+  }
+
+  void _toggleEditSection() {
+    final shouldScrollToForm = !_isEditing;
+    setState(() {
+      _isEditing = !_isEditing;
+      _showDeleteConfirm = false;
+      _showLogoutConfirm = false;
+    });
+
+    if (!shouldScrollToForm) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = _editSectionKey.currentContext;
+      if (context == null) return;
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+        alignment: 0.1,
+      );
     });
   }
 
@@ -220,10 +243,10 @@ class _ProfileViewState extends State<_ProfileView>
         final profile = state is ProfileLoaded
             ? state.profile
             : (state is ProfileOperationLoading
-                ? state.profile
-                : (state is ProfileSuccess
-                    ? state.profile
-                    : (state is ProfileError ? state.profile : null)));
+                  ? state.profile
+                  : (state is ProfileSuccess
+                        ? state.profile
+                        : (state is ProfileError ? state.profile : null)));
 
         if (profile == null) {
           return _buildSkeleton(cs);
@@ -232,11 +255,11 @@ class _ProfileViewState extends State<_ProfileView>
         final isOperationLoading = state is ProfileOperationLoading;
         final initials = profile.fullName.isNotEmpty
             ? profile.fullName
-                .split(' ')
-                .map((w) => w.isNotEmpty ? w[0] : '')
-                .take(2)
-                .join()
-                .toUpperCase()
+                  .split(' ')
+                  .map((w) => w.isNotEmpty ? w[0] : '')
+                  .take(2)
+                  .join()
+                  .toUpperCase()
             : '?';
 
         if (!_isEditing) {
@@ -245,173 +268,179 @@ class _ProfileViewState extends State<_ProfileView>
 
         return Scaffold(
           body: SafeArea(
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    context
-                        .read<ProfileBloc>()
-                        .add(const ProfileFetchRequested());
-                    await context.read<ProfileImageProvider>().loadImage();
-                  },
-                  child: ListView(
-                    controller: _scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                context.read<ProfileBloc>().add(const ProfileFetchRequested());
+                await context.read<ProfileImageProvider>().loadImage();
+              },
+              child: ListView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
+                children: [
+                  _buildAnimatedItem(
+                    0,
+                    _buildHeaderCard(
+                      context,
+                      profile,
+                      initials,
+                      isOperationLoading,
+                      cs,
+                      tt,
+                      loc,
+                      isLight,
                     ),
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
-                    children: [
-                      _buildAnimatedItem(
-                        0,
-                        _buildHeaderCard(
-                          context,
-                          profile,
-                          initials,
-                          isOperationLoading,
-                          cs,
-                          tt,
-                          loc,
-                          isLight,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildAnimatedItem(
+                    1,
+                    _buildSectionHeader(context, loc.account, cs, tt),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildAnimatedItem(
+                    2,
+                    _GlassTile(
+                      icon: Icons.edit_rounded,
+                      label: loc.editProfile,
+                      onTap: _toggleEditSection,
+                      isActive: _isEditing,
+                      trailing: AnimatedRotation(
+                        turns: _isEditing ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOutCubic,
+                        child: Icon(
+                          Icons.expand_more_rounded,
+                          size: 22,
+                          color: _isEditing
+                              ? cs.primary
+                              : cs.onSurfaceVariant.withValues(alpha: 0.5),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      _buildAnimatedItem(
-                        1,
-                        _buildSectionHeader(context, loc.account, cs, tt),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildAnimatedItem(
-                        2,
-                        _GlassTile(
-                          icon: Icons.edit_rounded,
-                          label: loc.editProfile,
-                          onTap: () => setState(() {
-                            _isEditing = !_isEditing;
-                            _showDeleteConfirm = false;
-                            _showLogoutConfirm = false;
-                          }),
-                          isActive: _isEditing,
-                          cs: cs,
-                          isLight: isLight,
-                        ),
-                      ),
+                      cs: cs,
+                      isLight: isLight,
+                    ),
+                  ),
+                  AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 300),
+                    crossFadeState: _isEditing
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    firstChild: const SizedBox(width: double.infinity),
+                    secondChild: Padding(
+                      key: _editSectionKey,
+                      padding: const EdgeInsets.only(top: 8),
+                      child: _buildEditSection(cs, tt, loc, isLight),
+                    ),
+                    sizeCurve: Curves.easeOutCubic,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildAnimatedItem(
+                    3,
+                    _buildSectionHeader(context, loc.preferences, cs, tt),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildAnimatedItem(
+                    4,
+                    _GlassTile(
+                      icon: themeNotifier.value == ThemeMode.dark
+                          ? Icons.dark_mode_rounded
+                          : Icons.light_mode_rounded,
+                      label: loc.darkMode,
+                      trailing: _ThemeToggle(cs: cs),
+                      onTap: () {
+                        themeNotifier.value =
+                            themeNotifier.value == ThemeMode.dark
+                            ? ThemeMode.light
+                            : ThemeMode.dark;
+                      },
+                      cs: cs,
+                      isLight: isLight,
+                    ),
+                  ),
+                  if (profile.profileImage != null) ...[
+                    const SizedBox(height: 16),
+                    _buildAnimatedItem(
+                      5,
                       AnimatedCrossFade(
                         duration: const Duration(milliseconds: 300),
-                        crossFadeState: _isEditing
-                            ? CrossFadeState.showSecond
-                            : CrossFadeState.showFirst,
-                        firstChild: const SizedBox(width: double.infinity),
-                        secondChild: Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: _buildEditSection(cs, tt, loc, isLight),
-                        ),
-                        sizeCurve: Curves.easeOutCubic,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildAnimatedItem(
-                        3,
-                        _buildSectionHeader(
-                            context, loc.preferences, cs, tt),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildAnimatedItem(
-                        4,
-                        _GlassTile(
-                          icon: themeNotifier.value == ThemeMode.dark
-                              ? Icons.dark_mode_rounded
-                              : Icons.light_mode_rounded,
-                          label: loc.darkMode,
-                          trailing: _ThemeToggle(cs: cs),
-                          onTap: () {
-                            themeNotifier.value =
-                                themeNotifier.value == ThemeMode.dark
-                                    ? ThemeMode.light
-                                    : ThemeMode.dark;
-                          },
-                          cs: cs,
-                          isLight: isLight,
-                        ),
-                      ),
-                      if (profile.profileImage != null) ...[
-                        const SizedBox(height: 16),
-                        _buildAnimatedItem(
-                          5,
-                          AnimatedCrossFade(
-                            duration: const Duration(milliseconds: 300),
-                            crossFadeState: _showDeleteConfirm
-                                ? CrossFadeState.showSecond
-                                : CrossFadeState.showFirst,
-                            firstChild: _GlassTile(
-                              icon: Icons.delete_rounded,
-                              label: loc.deleteImage,
-                              iconColor: cs.error,
-                              textColor: cs.error,
-                              onTap: isOperationLoading
-                                  ? null
-                                  : () => setState(() {
-                                        _showDeleteConfirm = true;
-                                        _showLogoutConfirm = false;
-                                      }),
-                              cs: cs,
-                              isLight: isLight,
-                            ),
-                            secondChild: _buildInlineConfirm(
-                              message: loc.confirmDeleteImage,
-                              hint: loc.confirmDeleteImageHint,
-                              confirmLabel: loc.confirm,
-                              onConfirm: () {
-                                context.read<ProfileBloc>().add(
-                                  const ProfileImageDeleteRequested(
-                                      confirmation: 'DELETE'),
-                                );
-                                setState(() => _showDeleteConfirm = false);
-                              },
-                              onCancel: () =>
-                                  setState(() => _showDeleteConfirm = false),
-                              cs: cs,
-                              isLight: isLight,
-                            ),
-                            sizeCurve: Curves.easeOutCubic,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 12),
-                      AnimatedCrossFade(
-                        duration: const Duration(milliseconds: 300),
-                        crossFadeState: _showLogoutConfirm
+                        crossFadeState: _showDeleteConfirm
                             ? CrossFadeState.showSecond
                             : CrossFadeState.showFirst,
                         firstChild: _GlassTile(
-                          icon: Icons.logout_rounded,
-                          label: loc.logout,
+                          icon: Icons.delete_rounded,
+                          label: loc.deleteImage,
                           iconColor: cs.error,
                           textColor: cs.error,
-                          onTap: () => setState(() {
-                            _showLogoutConfirm = true;
-                            _showDeleteConfirm = false;
-                          }),
+                          onTap: isOperationLoading
+                              ? null
+                              : () => setState(() {
+                                  _showDeleteConfirm = true;
+                                  _showLogoutConfirm = false;
+                                }),
                           cs: cs,
                           isLight: isLight,
                         ),
                         secondChild: _buildInlineConfirm(
-                          message: loc.confirmLogout,
-                          hint: loc.confirmLogoutHint,
+                          message: loc.confirmDeleteImage,
+                          hint: loc.confirmDeleteImageHint,
                           confirmLabel: loc.confirm,
-                          onConfirm: () async {
-                            await SessionManager()
-                                .logout(preserveBiometric: true);
+                          onConfirm: () {
+                            context.read<ProfileBloc>().add(
+                              const ProfileImageDeleteRequested(
+                                confirmation: 'DELETE',
+                              ),
+                            );
+                            setState(() => _showDeleteConfirm = false);
                           },
                           onCancel: () =>
-                              setState(() => _showLogoutConfirm = false),
+                              setState(() => _showDeleteConfirm = false),
                           cs: cs,
                           isLight: isLight,
-                          isDanger: true,
                         ),
                         sizeCurve: Curves.easeOutCubic,
                       ),
-                      const SizedBox(height: 40),
-                    ],
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 300),
+                    crossFadeState: _showLogoutConfirm
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    firstChild: _GlassTile(
+                      icon: Icons.logout_rounded,
+                      label: loc.logout,
+                      iconColor: cs.error,
+                      textColor: cs.error,
+                      onTap: () => setState(() {
+                        _showLogoutConfirm = true;
+                        _showDeleteConfirm = false;
+                      }),
+                      cs: cs,
+                      isLight: isLight,
+                    ),
+                    secondChild: _buildInlineConfirm(
+                      message: loc.confirmLogout,
+                      hint: loc.confirmLogoutHint,
+                      confirmLabel: loc.confirm,
+                      onConfirm: () async {
+                        await SessionManager().logout(preserveBiometric: true);
+                      },
+                      onCancel: () =>
+                          setState(() => _showLogoutConfirm = false),
+                      cs: cs,
+                      isLight: isLight,
+                      isDanger: true,
+                    ),
+                    sizeCurve: Curves.easeOutCubic,
                   ),
-                ),
+                  const SizedBox(height: 40),
+                ],
               ),
+            ),
+          ),
         );
       },
     );
@@ -480,9 +509,7 @@ class _ProfileViewState extends State<_ProfileView>
           const SizedBox(height: 6),
           Text(
             profile.email,
-            style: tt.bodyMedium?.copyWith(
-              color: cs.onSurfaceVariant,
-            ),
+            style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
           ),
           const SizedBox(height: 16),
           if (profile.roles.isNotEmpty)
@@ -587,8 +614,8 @@ class _ProfileViewState extends State<_ProfileView>
                           backgroundImage: hasSelectedFile
                               ? FileImage(_selectedFile!)
                               : (hasUploadedImage
-                                  ? MemoryImage(provider.imageBytes!)
-                                  : null),
+                                    ? MemoryImage(provider.imageBytes!)
+                                    : null),
                           child: showImage
                               ? null
                               : Text(
@@ -629,10 +656,7 @@ class _ProfileViewState extends State<_ProfileView>
                             decoration: BoxDecoration(
                               color: cs.primary,
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                color: cs.surface,
-                                width: 2.5,
-                              ),
+                              border: Border.all(color: cs.surface, width: 2.5),
                               boxShadow: [
                                 BoxShadow(
                                   color: cs.shadow.withValues(alpha: 0.15),
@@ -698,99 +722,102 @@ class _ProfileViewState extends State<_ProfileView>
     bool isLight,
   ) {
     return Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: isLight
+            ? Colors.white.withValues(alpha: 0.55)
+            : Colors.white.withValues(alpha: 0.06),
+        border: Border.all(
           color: isLight
-              ? Colors.white.withValues(alpha: 0.55)
-              : Colors.white.withValues(alpha: 0.06),
-          border: Border.all(
-            color: isLight
-                ? cs.primary.withValues(alpha: 0.3)
-                : cs.primary.withValues(alpha: 0.2),
-          ),
+              ? cs.primary.withValues(alpha: 0.3)
+              : cs.primary.withValues(alpha: 0.2),
         ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.person_rounded,
-                      size: 20, color: cs.onSurfaceVariant),
-                  const SizedBox(width: 8),
-                  Text(
-                    loc.personalInfo,
-                    style: tt.labelLarge?.copyWith(
-                      color: cs.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.3,
-                    ),
+      ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.person_rounded,
+                  size: 20,
+                  color: cs.onSurfaceVariant,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  loc.personalInfo,
+                  style: tt.labelLarge?.copyWith(
+                    color: cs.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.3,
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _buildField(
-                label: loc.firstName,
-                controller: _firstNameCtrl,
-                icon: Icons.person_outline_rounded,
-                cs: cs,
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return loc.firstnameRequired;
-                  if (v.trim().length < 2) return loc.firstnameMin;
-                  if (v.trim().length > 100) return loc.firstnameMax;
-                  return null;
-                },
-              ),
-              const SizedBox(height: 14),
-              _buildField(
-                label: loc.lastName,
-                controller: _lastNameCtrl,
-                icon: Icons.person_outline_rounded,
-                cs: cs,
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return loc.lastnameRequired;
-                  if (v.trim().length < 2) return loc.lastnameMin;
-                  if (v.trim().length > 100) return loc.lastnameMax;
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 48,
-                      child: FilledButton(
-                        onPressed: _hasChanges ? _handleSave : null,
-                        style: FilledButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: Text(loc.saveChangesButton),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _buildField(
+              label: loc.firstName,
+              controller: _firstNameCtrl,
+              icon: Icons.person_outline_rounded,
+              cs: cs,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return loc.firstnameRequired;
+                if (v.trim().length < 2) return loc.firstnameMin;
+                if (v.trim().length > 100) return loc.firstnameMax;
+                return null;
+              },
+            ),
+            const SizedBox(height: 14),
+            _buildField(
+              label: loc.lastName,
+              controller: _lastNameCtrl,
+              icon: Icons.person_outline_rounded,
+              cs: cs,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return loc.lastnameRequired;
+                if (v.trim().length < 2) return loc.lastnameMin;
+                if (v.trim().length > 100) return loc.lastnameMax;
+                return null;
+              },
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
                     height: 48,
-                    child: OutlinedButton(
-                      onPressed: _cancelEdit,
-                      style: OutlinedButton.styleFrom(
+                    child: FilledButton(
+                      onPressed: _hasChanges ? _handleSave : null,
+                      style: FilledButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: Text(loc.cancel),
+                      child: Text(loc.saveChangesButton),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  height: 48,
+                  child: OutlinedButton(
+                    onPressed: _cancelEdit,
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(loc.cancel),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
+      ),
     );
   }
 
@@ -802,35 +829,39 @@ class _ProfileViewState extends State<_ProfileView>
     required String? Function(String?)? validator,
   }) {
     return Focus(
-      child: Builder(builder: (context) {
-        final hasFocus = Focus.of(context).hasFocus;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: hasFocus ? cs.primary : cs.outlineVariant,
-              width: hasFocus ? 1.5 : 1,
-            ),
-          ),
-          child: TextFormField(
-            controller: controller,
-            validator: validator,
-            decoration: InputDecoration(
-              labelText: label,
-              prefixIcon: Icon(icon, size: 20),
-              filled: true,
-              fillColor: cs.surface,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none,
+      child: Builder(
+        builder: (context) {
+          final hasFocus = Focus.of(context).hasFocus;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: hasFocus ? cs.primary : cs.outlineVariant,
+                width: hasFocus ? 1.5 : 1,
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
-          ),
-        );
-      }),
+            child: TextFormField(
+              controller: controller,
+              validator: validator,
+              decoration: InputDecoration(
+                labelText: label,
+                prefixIcon: Icon(icon, size: 20),
+                filled: true,
+                fillColor: cs.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -864,82 +895,82 @@ class _ProfileViewState extends State<_ProfileView>
     bool isDanger = false,
   }) {
     return Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          color: (isDanger ? cs.error : cs.primary)
-              .withValues(alpha: isLight ? 0.08 : 0.12),
-          border: Border.all(
-            color: (isDanger ? cs.error : cs.primary)
-                .withValues(alpha: isLight ? 0.25 : 0.2),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: (isDanger ? cs.error : cs.primary).withValues(
+          alpha: isLight ? 0.08 : 0.12,
+        ),
+        border: Border.all(
+          color: (isDanger ? cs.error : cs.primary).withValues(
+            alpha: isLight ? 0.25 : 0.2,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  isDanger ? Icons.warning_rounded : Icons.info_outline_rounded,
-                  size: 20,
-                  color: isDanger ? cs.error : cs.primary,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    message,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: cs.onSurface,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (hint.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.only(left: 30),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                isDanger ? Icons.warning_rounded : Icons.info_outline_rounded,
+                size: 20,
+                color: isDanger ? cs.error : cs.primary,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
                 child: Text(
-                  hint,
+                  message,
                   style: TextStyle(
-                    fontSize: 13,
-                    color: cs.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    color: cs.onSurface,
                   ),
                 ),
               ),
             ],
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: onCancel,
-                  child: Text(
-                    AppLocalizations.of(context)!.cancel,
-                    style: TextStyle(color: cs.onSurfaceVariant),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: onConfirm,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: isDanger ? cs.error : cs.primary,
-                    foregroundColor:
-                        isDanger ? cs.onError : cs.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                    minimumSize: Size.zero,
-                  ),
-                  child: Text(confirmLabel),
-                ),
-              ],
+          ),
+          if (hint.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.only(left: 30),
+              child: Text(
+                hint,
+                style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
+              ),
             ),
           ],
-        ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: onCancel,
+                child: Text(
+                  AppLocalizations.of(context)!.cancel,
+                  style: TextStyle(color: cs.onSurfaceVariant),
+                ),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(
+                onPressed: onConfirm,
+                style: FilledButton.styleFrom(
+                  backgroundColor: isDanger ? cs.error : cs.primary,
+                  foregroundColor: isDanger ? cs.onError : cs.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  minimumSize: Size.zero,
+                ),
+                child: Text(confirmLabel),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -1000,8 +1031,11 @@ class _ProfileViewState extends State<_ProfileView>
                     color: cs.error.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.error_outline_rounded,
-                      size: 40, color: cs.error),
+                  child: Icon(
+                    Icons.error_outline_rounded,
+                    size: 40,
+                    color: cs.error,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Text(
@@ -1014,9 +1048,9 @@ class _ProfileViewState extends State<_ProfileView>
                 ),
                 const SizedBox(height: 32),
                 FilledButton.icon(
-                  onPressed: () => context
-                      .read<ProfileBloc>()
-                      .add(const ProfileFetchRequested()),
+                  onPressed: () => context.read<ProfileBloc>().add(
+                    const ProfileFetchRequested(),
+                  ),
                   icon: const Icon(Icons.refresh_rounded),
                   label: Text(loc.retryLabel),
                 ),
@@ -1123,8 +1157,12 @@ class _GlassTileState extends State<_GlassTile>
     final textColor = widget.textColor ?? widget.cs.onSurface;
 
     return GestureDetector(
-      onTapDown: widget.onTap != null ? (_) => setState(() => _scale = 0.96) : null,
-      onTapUp: widget.onTap != null ? (_) => setState(() => _scale = 1.0) : null,
+      onTapDown: widget.onTap != null
+          ? (_) => setState(() => _scale = 0.96)
+          : null,
+      onTapUp: widget.onTap != null
+          ? (_) => setState(() => _scale = 1.0)
+          : null,
       onTapCancel: () => setState(() => _scale = 1.0),
       child: AnimatedScale(
         scale: _scale,
@@ -1144,16 +1182,18 @@ class _GlassTileState extends State<_GlassTile>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
                 color: widget.isActive
-                    ? widget.cs.primary.withValues(alpha: widget.isLight ? 0.10 : 0.15)
+                    ? widget.cs.primary.withValues(
+                        alpha: widget.isLight ? 0.10 : 0.15,
+                      )
                     : widget.isLight
-                        ? Colors.white.withValues(alpha: 0.6)
-                        : Colors.white.withValues(alpha: 0.06),
+                    ? Colors.white.withValues(alpha: 0.6)
+                    : Colors.white.withValues(alpha: 0.06),
                 border: Border.all(
                   color: widget.isActive
                       ? widget.cs.primary.withValues(alpha: 0.3)
                       : widget.isLight
-                          ? Colors.white.withValues(alpha: 0.7)
-                          : Colors.white.withValues(alpha: 0.10),
+                      ? Colors.white.withValues(alpha: 0.7)
+                      : Colors.white.withValues(alpha: 0.10),
                 ),
               ),
               child: Row(
@@ -1251,9 +1291,7 @@ class _ThemeToggleState extends State<_ThemeToggle>
             padding: const EdgeInsets.symmetric(horizontal: 3),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: isDark
-                  ? const Color(0xFF374151)
-                  : const Color(0xFFE5E7EB),
+              color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
             ),
             child: Align(
               alignment: isDark ? Alignment.centerRight : Alignment.centerLeft,
@@ -1268,10 +1306,11 @@ class _ThemeToggleState extends State<_ThemeToggle>
                       : const Color(0xFFF59E0B),
                   boxShadow: [
                     BoxShadow(
-                      color: (isDark
-                              ? const Color(0xFF6366F1)
-                              : const Color(0xFFF59E0B))
-                          .withValues(alpha: 0.3),
+                      color:
+                          (isDark
+                                  ? const Color(0xFF6366F1)
+                                  : const Color(0xFFF59E0B))
+                              .withValues(alpha: 0.3),
                       blurRadius: 6,
                     ),
                   ],
