@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:gastos_personales/data/dio_client.dart';
 import 'package:gastos_personales/layers/login/data/dto/login_response.dart';
 import 'package:gastos_personales/util/api_endpoints.dart';
 
@@ -7,12 +8,12 @@ abstract class Api {
 }
 
 class ApiImpl implements Api {
-  final dio = Dio();
+  final Dio _dio = DioClient().dio;
 
   @override
   Future<LoginResponse> login(String email, String password) async {
     try {
-      final response = await dio.post(
+      final response = await _dio.post(
         ApiEndpoints.login,
         data: {'email': email, 'password': password},
       );

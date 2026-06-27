@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gastos_personales/data/repositories/auth_repository.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/change_password_page.dart';
 import 'package:gastos_personales/presentation/screens/widgets/active_session_row.dart';
 import 'package:gastos_personales/presentation/screens/widgets/destructive_action_button.dart';
@@ -65,22 +66,20 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   Future<void> _showEnrollBiometricDialog(BuildContext context) async {
+    final loc = AppLocalizations.of(context)!;
     final goToSettings = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Registrar huella digital'),
-        content: const Text(
-          'No hay huellas registradas en el dispositivo. '
-          'Ve a Ajustes > Seguridad y registra una huella para usar esta función.',
-        ),
+        title: Text(loc.fingerprintNotRegisteredTitle),
+        content: Text(loc.fingerprintNotRegisteredMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(loc.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Ir a Ajustes'),
+            child: Text(loc.goToSettings),
           ),
         ],
       ),
@@ -91,28 +90,26 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   void _handleCloseAllSessions() {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Cerrar todas las sesiones'),
-        content: const Text(
-          'Se cerrarán todas las sesiones activas, incluyendo la actual. '
-          'Deberás iniciar sesión nuevamente.',
-        ),
+        title: Text(loc.closeAllSessionsTitle),
+        content: Text(loc.closeAllSessionsMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Sesiones cerradas correctamente')),
+                SnackBar(content: Text(loc.sessionsClosed)),
               );
             },
-            child: Text('Cerrar todo', style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
+            child: Text(loc.closeAll, style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
           ),
         ],
       ),
@@ -121,19 +118,20 @@ class _SecurityPageState extends State<SecurityPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
-            const SettingsAppBar(title: 'Seguridad'),
+            SettingsAppBar(title: loc.securityTitle),
             const SizedBox(height: 16),
-            const SettingsSectionHeader(title: 'Cuenta'),
+            SettingsSectionHeader(title: loc.accountSection),
             SettingsGroupCard(
               rows: [
                 SettingsNavigationRow(
                   icon: Icons.lock_outline,
-                  title: 'Cambiar contraseña',
+                  title: loc.changePassword,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ChangePasswordPage()),
@@ -141,7 +139,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 ),
                 SettingsSwitchRow(
                   icon: Icons.fingerprint,
-                  title: 'Acceso biométrico',
+                  title: loc.biometricAccess,
                   value: _biometricAccess,
                   onChanged: _loadingBiometric
                       ? (_) {}
@@ -151,21 +149,21 @@ class _SecurityPageState extends State<SecurityPage> {
                 ),
                 SettingsSwitchRow(
                   icon: Icons.shield_outlined,
-                  title: '2FA por SMS',
+                  title: loc.sms2FA,
                   value: _smsTwoFactor,
                   onChanged: (v) => setState(() => _smsTwoFactor = v),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            const SettingsSectionHeader(title: 'Sesiones activas'),
-            const SettingsGroupCard(
+            SettingsSectionHeader(title: loc.activeSessions),
+            SettingsGroupCard(
               rows: [
                 ActiveSessionRow(
                   icon: Icons.phone_iphone,
                   deviceName: 'iPhone 15 Pro',
                   locationInfo: 'Lima · Activo ahora',
-                  badgeLabel: 'Actual',
+                  badgeLabel: loc.currentSession,
                 ),
                 ActiveSessionRow(
                   icon: Icons.language,
@@ -176,7 +174,7 @@ class _SecurityPageState extends State<SecurityPage> {
             ),
             const SizedBox(height: 20),
             DestructiveActionButton(
-              label: 'Cerrar todas las sesiones',
+              label: loc.closeAllSessions,
               onPressed: _handleCloseAllSessions,
             ),
           ],

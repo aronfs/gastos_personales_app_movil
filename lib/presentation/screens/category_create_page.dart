@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gastos_personales/layers/categories/domain/entity/category.dart';
 import 'package:gastos_personales/presentation/screens/bloc/categories/categories_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/util/color_helper.dart';
 import 'package:gastos_personales/util/icon_helper.dart';
 
@@ -63,6 +64,7 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
 
     return BlocListener<CategoriesBloc, CategoriesState>(
       listener: (context, state) {
@@ -71,7 +73,7 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Categoría creada correctamente.'),
+              content: Text(loc.categoryCreateSuccess),
               backgroundColor: cs.tertiary,
             ),
           );
@@ -96,7 +98,7 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Nueva categoría'),
+          title: Text(loc.newCategory),
           centerTitle: true,
         ),
         body: SingleChildScrollView(
@@ -109,18 +111,18 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
-                    labelText: 'Nombre',
+                    labelText: loc.categoryName,
                     border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                   validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'El nombre es obligatorio' : null,
+                      (v == null || v.trim().isEmpty) ? loc.categoryNameRequired : null,
                 ),
                 const SizedBox(height: 24),
 
                 // ── Selector de ícono expandible ──
                 _buildSectionHeader(
                   cs: cs,
-                  title: 'ICONO',
+                  title: loc.iconLabel,
                   trailing: Text(
                     _iconValue,
                     style: TextStyle(
@@ -151,7 +153,7 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
                 // ── Selector de color expandible ──
                 _buildSectionHeader(
                   cs: cs,
-                  title: 'COLOR',
+                  title: loc.colorLabel,
                   trailing: Text(
                     _colorValue,
                     style: TextStyle(
@@ -181,17 +183,17 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
                 DropdownButtonFormField<CategoryType>(
                   initialValue: _selectedType,
                   decoration: InputDecoration(
-                    labelText: 'Tipo',
+                    labelText: loc.categoryType,
                     border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: CategoryType.expense,
-                      child: Text('Gasto'),
+                      child: Text(loc.expenseType),
                     ),
                     DropdownMenuItem(
                       value: CategoryType.income,
-                      child: Text('Ingreso'),
+                      child: Text(loc.incomeType),
                     ),
                   ],
                   onChanged: _isSaving
@@ -212,7 +214,7 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
                             color: cs.surfaceContainerLowest,
                           ),
                         )
-                      : const Text('Crear categoría'),
+                      : Text(loc.createCategory),
                 ),
               ],
             ),

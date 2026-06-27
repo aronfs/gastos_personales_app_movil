@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 
 /// Fila horizontal y scrollable de chips de filtro, donde uno está
 /// activo (fondo azul, texto blanco) y el resto en estilo neutro.
@@ -19,6 +20,7 @@ class FilterChipsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
     final resolvedActiveColor = activeColor ?? cs.primary;
     return SizedBox(
       height: 38,
@@ -40,7 +42,7 @@ class FilterChipsRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                option,
+                option == 'Todos' ? loc.all : option,
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w600,

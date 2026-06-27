@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/incomes/data/incomes_repository_impl.dart';
 import 'package:gastos_personales/layers/incomes/data/source/network/incomes_api.dart';
 import 'package:gastos_personales/layers/incomes/domain/usecase/delete_income.dart';
@@ -42,19 +43,20 @@ class _IncomeView extends StatelessWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, Movement income) async {
+    final loc = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar ingreso'),
-        content: Text('¿Eliminar "${income.description}"?'),
+        title: Text(loc.deleteIncomeTitle),
+        content: Text(loc.deleteIncomeConfirm(income.description)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Eliminar', style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
+            child: Text(loc.delete, style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
           ),
         ],
       ),
@@ -66,6 +68,7 @@ class _IncomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: cs.surfaceContainerLow,
@@ -84,11 +87,11 @@ class _IncomeView extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
                 children: [
-                  const SimplePageAppBar(title: 'Ingresos'),
+                  SimplePageAppBar(title: loc.incomePageTitle),
                   const SizedBox(height: 16),
                   if (state is IncomesLoaded)
                     GradientSummaryCard(
-                      label: 'Ingresos del mes',
+                      label: loc.incomesMonth,
                       amountLabel:
                           '\$ ${state.monthlyTotal.toStringAsFixed(2)}',
                       gradientColors: const [
@@ -97,8 +100,8 @@ class _IncomeView extends StatelessWidget {
                       ],
                     )
                   else
-                    const GradientSummaryCard(
-                      label: 'Ingresos del mes',
+                    GradientSummaryCard(
+                      label: loc.incomesMonth,
                       amountLabel: '\$ 0.00',
                       gradientColors: [
                         Color(0xFF3DDC73),
@@ -126,6 +129,7 @@ class _IncomeView extends StatelessWidget {
   }
 
   List<Widget> _buildBody(BuildContext context, IncomesState state) {
+    final loc = AppLocalizations.of(context)!;
     if (state is IncomesLoading || state is IncomesInitial) {
       return [
         const SizedBox(height: 80),
@@ -145,7 +149,7 @@ class _IncomeView extends StatelessWidget {
                 onPressed: () => context.read<IncomesBloc>().add(
                   const IncomesFetchRequested(),
                 ),
-                child: const Text('Reintentar'),
+                child: Text(loc.retry),
               ),
             ],
           ),
@@ -157,7 +161,7 @@ class _IncomeView extends StatelessWidget {
     if (loaded.filtered.isEmpty) {
       return [
         const SizedBox(height: 40),
-        const Center(child: Text('Sin ingresos registrados')),
+        Center(child: Text(loc.noIncomes)),
       ];
     }
 

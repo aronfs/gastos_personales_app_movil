@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/categories/data/categories_repository_impl.dart';
 import 'package:gastos_personales/layers/categories/data/source/network/categories_api.dart';
 import 'package:gastos_personales/layers/categories/domain/entity/category.dart';
@@ -54,20 +55,23 @@ class _CategoriesView extends StatelessWidget {
   Future<void> _confirmDelete(BuildContext context, Category category) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar categoría'),
-        content: Text('¿Eliminar "${category.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Eliminar', style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final loc = AppLocalizations.of(ctx)!;
+        return AlertDialog(
+          title: Text(loc.deleteCategory),
+          content: Text(loc.deleteCategoryConfirm(category.name)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(loc.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(loc.delete, style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed == true && context.mounted) {
       context.read<CategoriesBloc>().add(
@@ -79,6 +83,7 @@ class _CategoriesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: BlocConsumer<CategoriesBloc, CategoriesState>(
@@ -86,7 +91,7 @@ class _CategoriesView extends StatelessWidget {
             if (state is CategoriesUpdateSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text('Categoría actualizada correctamente.'),
+                  content: Text(loc.categoryUpdateSuccess),
                   backgroundColor: cs.tertiary,
                 ),
               );
@@ -120,7 +125,7 @@ class _CategoriesView extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
-                  const SimplePageAppBar(title: 'Categorías'),
+                  SimplePageAppBar(title: loc.categoriesTitle),
                   const SizedBox(height: 20),
                   ..._buildBody(context, state),
                 ],
@@ -133,6 +138,7 @@ class _CategoriesView extends StatelessWidget {
   }
 
   List<Widget> _buildBody(BuildContext context, CategoriesState state) {
+    final loc = AppLocalizations.of(context)!;
     if (state is CategoriesLoading || state is CategoriesInitial) {
       return [
         const SizedBox(height: 80),
@@ -152,7 +158,7 @@ class _CategoriesView extends StatelessWidget {
                 onPressed: () => context.read<CategoriesBloc>().add(
                   const CategoriesFetchRequested(),
                 ),
-                child: const Text('Reintentar'),
+                child: Text(loc.retry),
               ),
             ],
           ),
@@ -171,7 +177,7 @@ class _CategoriesView extends StatelessWidget {
     if (categories.isEmpty) {
       return [
         const SizedBox(height: 80),
-        const Center(child: Text('No hay categorías')),
+        Center(child: Text(loc.noCategories)),
       ];
     }
 

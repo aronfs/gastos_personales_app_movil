@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:gastos_personales/util/api_endpoints.dart';
+import 'package:gastos_personales/util/session_manager.dart';
 import 'package:gastos_personales/util/token_storage.dart';
 
 class DioClient {
@@ -18,14 +19,23 @@ class DioClient {
 }
 
 class _AuthInterceptor extends Interceptor {
+  bool _isRefreshing = false;
+
   @override
   void onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final token = await TokenStorage.getToken();
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+    if (_isRefreshing) {
+      final newToken = await TokenStorage.getToken();
+      if (newToken != null && newToken.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $newToken';
+      }
+    } else {
+      final token = await TokenStorage.getToken();
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
     }
     handler.next(options);
   }
@@ -35,19 +45,30 @@ class _AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    if (err.response?.statusCode != 401) {
+    final statusCode = err.response?.statusCode;
+
+    if (statusCode != 401 && statusCode != 403) {
       return handler.next(err);
     }
 
     if (err.requestOptions.path.contains('/auth/refresh')) {
-      await TokenStorage.clearAll();
+      await SessionManager().forceLogout();
       return handler.next(err);
     }
+
+    if (err.requestOptions.path.contains('/auth/login') ||
+        err.requestOptions.path.contains('/auth/register')) {
+      return handler.next(err);
+    }
+
+    if (_isRefreshing) return handler.next(err);
+
+    _isRefreshing = true;
 
     try {
       final refreshToken = await TokenStorage.getRefreshToken();
       if (refreshToken == null || refreshToken.isEmpty) {
-        await TokenStorage.clearAll();
+        await SessionManager().forceLogout();
         return handler.next(err);
       }
 
@@ -68,8 +89,10 @@ class _AuthInterceptor extends Interceptor {
       final response = await Dio().fetch(err.requestOptions);
       return handler.resolve(response);
     } catch (_) {
-      await TokenStorage.clearAll();
+      await SessionManager().forceLogout();
       return handler.next(err);
+    } finally {
+      _isRefreshing = false;
     }
   }
 }

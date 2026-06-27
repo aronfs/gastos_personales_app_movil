@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/profile/data/profile_repository_impl.dart';
 import 'package:gastos_personales/layers/profile/data/source/network/profile_api.dart';
 import 'package:gastos_personales/layers/profile/domain/usecase/delete_profile_image.dart';
@@ -13,9 +14,8 @@ import 'package:gastos_personales/presentation/screens/bloc/profile/profile_bloc
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_event.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_state.dart';
 import 'package:gastos_personales/presentation/screens/edit_profile_page.dart';
-import 'package:gastos_personales/navigation/route.dart';
 import 'package:gastos_personales/presentation/screens/widgets/profile_avatar.dart';
-import 'package:gastos_personales/util/token_storage.dart';
+import 'package:gastos_personales/util/session_manager.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -51,17 +51,16 @@ class _ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<_ProfileView> {
   void _showDeleteConfirmation(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Delete profile image'),
-        content: const Text(
-          'Are you sure you want to delete your profile photo?',
-        ),
+        title: Text(loc.deleteProfileImageTitle),
+        content: Text(loc.deleteProfileImageMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -74,7 +73,7 @@ class _ProfileViewState extends State<_ProfileView> {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: const Text('Delete'),
+            child: Text(loc.delete),
           ),
         ],
       ),
@@ -83,6 +82,7 @@ class _ProfileViewState extends State<_ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
@@ -126,7 +126,7 @@ class _ProfileViewState extends State<_ProfileView> {
                         const ProfileFetchRequested(),
                       ),
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Retry'),
+                      label: Text(loc.retryLabel),
                     ),
                   ],
                 ),
@@ -295,7 +295,7 @@ class _ProfileViewState extends State<_ProfileView> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              profile.active ? 'Active' : 'Inactive',
+                              profile.active ? loc.active : loc.inactive,
                               style: tt.labelSmall?.copyWith(
                                 color: profile.active
                                     ? cs.tertiary
@@ -315,7 +315,7 @@ class _ProfileViewState extends State<_ProfileView> {
                 // ── Action buttons ───────────────────────────────────
                 _ActionButton(
                   icon: Icons.person_outline,
-                  label: 'Edit profile',
+                  label: loc.editProfile,
                   onTap: () async {
                     final bloc = context.read<ProfileBloc>();
                     final result = await Navigator.push<bool>(
@@ -341,7 +341,7 @@ class _ProfileViewState extends State<_ProfileView> {
                   const SizedBox(height: 10),
                   _ActionButton(
                     icon: Icons.delete_outline,
-                    label: 'Delete image',
+                    label: loc.deleteImage,
                     textColor: cs.error,
                     onTap: isOperationLoading
                         ? null
@@ -354,8 +354,8 @@ class _ProfileViewState extends State<_ProfileView> {
                       ? Icons.light_mode_outlined
                       : Icons.dark_mode_outlined,
                   label: themeNotifier.value == ThemeMode.dark
-                      ? 'Tema claro'
-                      : 'Tema oscuro',
+                      ? loc.lightTheme
+                      : loc.darkTheme,
                   onTap: () {
                     themeNotifier.value = themeNotifier.value == ThemeMode.dark
                         ? ThemeMode.light
@@ -365,19 +365,10 @@ class _ProfileViewState extends State<_ProfileView> {
                 const SizedBox(height: 10),
                 _ActionButton(
                   icon: Icons.logout,
-                  label: 'Cerrar sesión',
+                  label: loc.logout,
                   textColor: cs.error,
                   onTap: () async {
-                    await TokenStorage.clearSession(
-                      preserveBiometricLogin: true,
-                    );
-                    if (context.mounted) {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        signin,
-                        (_) => false,
-                      );
-                    }
+                    await SessionManager().logout(preserveBiometric: true);
                   },
                 ),
               ],

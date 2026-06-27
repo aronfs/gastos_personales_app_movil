@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:gastos_personales/data/dio_client.dart';
 import 'package:gastos_personales/layers/movements/data/dto/movement_dto.dart';
 import 'package:gastos_personales/layers/movements/domain/entity/movement.dart';
 import 'package:gastos_personales/util/api_endpoints.dart';
-import 'package:gastos_personales/util/token_storage.dart';
 
 abstract class IncomesApi {
   Future<List<Movement>> getIncomes();
@@ -12,20 +12,12 @@ abstract class IncomesApi {
 }
 
 class IncomesApiImpl implements IncomesApi {
-  final Dio _dio = Dio();
-
-  Future<Map<String, String>> _headers() async {
-    final token = await TokenStorage.getToken();
-    return {'Authorization': 'Bearer $token'};
-  }
+  final Dio _dio = DioClient().dio;
 
   @override
   Future<List<Movement>> getIncomes() async {
     try {
-      final response = await _dio.get(
-        ApiEndpoints.incomes,
-        options: Options(headers: await _headers()),
-      );
+      final response = await _dio.get(ApiEndpoints.incomes);
       return MovementDto.listFromResponse(
         response.data as Map<String, dynamic>,
       );
@@ -42,7 +34,6 @@ class IncomesApiImpl implements IncomesApi {
       final response = await _dio.post(
         ApiEndpoints.incomes,
         data: body,
-        options: Options(headers: await _headers()),
       );
       return MovementDto.fromMap(
         (response.data as Map<String, dynamic>)['data']
@@ -61,7 +52,6 @@ class IncomesApiImpl implements IncomesApi {
       final response = await _dio.put(
         '${ApiEndpoints.incomes}/$id',
         data: body,
-        options: Options(headers: await _headers()),
       );
       return MovementDto.fromMap(
         (response.data as Map<String, dynamic>)['data']
@@ -77,10 +67,7 @@ class IncomesApiImpl implements IncomesApi {
   @override
   Future<void> deleteIncome(String id) async {
     try {
-      await _dio.delete(
-        '${ApiEndpoints.incomes}/$id',
-        options: Options(headers: await _headers()),
-      );
+      await _dio.delete('${ApiEndpoints.incomes}/$id');
     } on DioException catch (e) {
       throw Exception(
         'Delete income error: ${e.response?.statusCode} ${e.message}',

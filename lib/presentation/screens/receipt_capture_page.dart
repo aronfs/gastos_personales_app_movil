@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/receipt_scanner/domain/usecase/analyze_receipt_usecase.dart';
 import 'package:gastos_personales/presentation/screens/receipt_edit_page.dart';
 
@@ -40,10 +41,11 @@ class _ReceiptCapturePageState extends State<ReceiptCapturePage> with WidgetsBin
   }
 
   Future<void> _initCamera() async {
+    final loc = AppLocalizations.of(context)!;
     try {
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
-        _setState(_CaptureState.error, 'No se detectó la cámara');
+        _setState(_CaptureState.error, loc.noCameraDetected);
         return;
       }
 
@@ -63,7 +65,7 @@ class _ReceiptCapturePageState extends State<ReceiptCapturePage> with WidgetsBin
       if (!mounted) return;
       setState(() {});
     } catch (e) {
-      _setState(_CaptureState.error, 'Error al iniciar la cámara');
+      _setState(_CaptureState.error, loc.cameraError);
     }
   }
 
@@ -88,18 +90,20 @@ class _ReceiptCapturePageState extends State<ReceiptCapturePage> with WidgetsBin
 
   Future<void> _captureImage() async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) return;
-    _setState(_CaptureState.processing, 'Capturando imagen...');
+    final loc = AppLocalizations.of(context)!;
+    _setState(_CaptureState.processing, loc.capturingImage);
 
     try {
       final xFile = await _cameraController!.takePicture();
       await _processImage(xFile.path);
     } catch (e) {
-      _setState(_CaptureState.error, 'Error al capturar la imagen');
+      _setState(_CaptureState.error, loc.captureError);
     }
   }
 
   Future<void> _pickFromGallery() async {
-    _setState(_CaptureState.processing, 'Seleccionando imagen...');
+    final loc = AppLocalizations.of(context)!;
+    _setState(_CaptureState.processing, loc.selectingImage);
 
     try {
       final picker = ImagePicker();
@@ -115,17 +119,18 @@ class _ReceiptCapturePageState extends State<ReceiptCapturePage> with WidgetsBin
   }
 
   Future<void> _processImage(String imagePath) async {
-    _setState(_CaptureState.processing, 'Procesando OCR...');
+    final loc = AppLocalizations.of(context)!;
+    _setState(_CaptureState.processing, loc.processingOcr);
 
     try {
       final inputImage = InputImage.fromFilePath(imagePath);
       final recognizedText = await _textRecognizer.processImage(inputImage);
       final ocrText = recognizedText.text;
 
-      _setState(_CaptureState.processing, 'Analizando factura...');
+      _setState(_CaptureState.processing, loc.analyzingReceipt);
       await Future.delayed(const Duration(milliseconds: 300));
 
-      _setState(_CaptureState.processing, 'Detectando total...');
+      _setState(_CaptureState.processing, loc.detectingTotal);
       await Future.delayed(const Duration(milliseconds: 300));
 
       final analysis = _analyzeUseCase(ocrText);
@@ -155,7 +160,7 @@ class _ReceiptCapturePageState extends State<ReceiptCapturePage> with WidgetsBin
         }
       }
     } catch (e) {
-      _setState(_CaptureState.error, 'Error al procesar la imagen');
+      _setState(_CaptureState.error, loc.imageProcessingError);
     }
   }
 
@@ -169,6 +174,7 @@ class _ReceiptCapturePageState extends State<ReceiptCapturePage> with WidgetsBin
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -220,7 +226,7 @@ class _ReceiptCapturePageState extends State<ReceiptCapturePage> with WidgetsBin
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () => _setState(_CaptureState.preview, ''),
-                      child: const Text('Volver a intentar'),
+                      child: Text(loc.retry),
                     ),
                   ],
                 ),
@@ -239,7 +245,7 @@ class _ReceiptCapturePageState extends State<ReceiptCapturePage> with WidgetsBin
                     onPressed: () => Navigator.pop(context),
                   ),
                   Text(
-                    'Escanear Factura',
+                    loc.scanReceipt,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -312,8 +318,8 @@ class _ReceiptCapturePageState extends State<ReceiptCapturePage> with WidgetsBin
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Toma una foto de la factura',
+                  Text(
+                    loc.takePhotoHint,
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ],

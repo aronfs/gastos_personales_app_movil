@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:gastos_personales/data/dio_client.dart';
 import 'package:gastos_personales/layers/register/data/dto/register_response.dart';
 import 'package:gastos_personales/util/api_endpoints.dart';
 
@@ -12,7 +13,7 @@ abstract class RegisterApi {
 }
 
 class RegisterApiImpl implements RegisterApi {
-  final dio = Dio();
+  final Dio _dio = DioClient().dio;
 
   @override
   Future<RegisterResponse> register({
@@ -22,7 +23,7 @@ class RegisterApiImpl implements RegisterApi {
     required String lastName,
   }) async {
     try {
-      final response = await dio.post(
+      final response = await _dio.post(
         ApiEndpoints.register,
         data: {
           'email': email,

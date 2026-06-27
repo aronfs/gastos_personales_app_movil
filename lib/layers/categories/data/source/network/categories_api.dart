@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:gastos_personales/data/dio_client.dart';
 import 'package:gastos_personales/layers/categories/data/dto/category_dto.dart';
 import 'package:gastos_personales/layers/categories/domain/entity/category.dart';
 import 'package:gastos_personales/util/api_endpoints.dart';
-import 'package:gastos_personales/util/token_storage.dart';
 
 abstract class CategoriesApi {
   Future<List<Category>> getCategories({CategoryType? type});
@@ -22,12 +22,7 @@ abstract class CategoriesApi {
 }
 
 class CategoriesApiImpl implements CategoriesApi {
-  final Dio _dio = Dio();
-
-  Future<Options> get _authOptions async {
-    final token = await TokenStorage.getToken();
-    return Options(headers: {'Authorization': 'Bearer $token'});
-  }
+  final Dio _dio = DioClient().dio;
 
   @override
   Future<List<Category>> getCategories({CategoryType? type}) async {
@@ -38,7 +33,6 @@ class CategoriesApiImpl implements CategoriesApi {
           if (type != null)
             'type': type == CategoryType.income ? 'INCOME' : 'EXPENSE',
         },
-        options: await _authOptions,
       );
       return CategoryDto.listFromResponse(
         response.data as Map<String, dynamic>,
@@ -69,7 +63,6 @@ class CategoriesApiImpl implements CategoriesApi {
       final response = await _dio.post(
         ApiEndpoints.categories,
         data: dto.toCreateMap(),
-        options: await _authOptions,
       );
       final data = response.data as Map<String, dynamic>;
       return CategoryDto.fromMap(data);
@@ -99,7 +92,6 @@ class CategoriesApiImpl implements CategoriesApi {
       final response = await _dio.put(
         '${ApiEndpoints.categories}/$id',
         data: dto.toUpdateMap(),
-        options: await _authOptions,
       );
 
       if (response.statusCode == 200) {
@@ -137,10 +129,7 @@ class CategoriesApiImpl implements CategoriesApi {
   @override
   Future<void> deleteCategory(String id) async {
     try {
-      await _dio.delete(
-        '${ApiEndpoints.categories}/$id',
-        options: await _authOptions,
-      );
+      await _dio.delete('${ApiEndpoints.categories}/$id');
     } on DioException catch (e) {
       throw Exception(
         'Delete category error: ${e.response?.statusCode} ${e.message}',

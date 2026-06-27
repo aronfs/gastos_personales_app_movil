@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 
 class MonthlyOverview extends StatelessWidget {
   final double income;
@@ -16,6 +17,7 @@ class MonthlyOverview extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final loc = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -46,7 +48,7 @@ class MonthlyOverview extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                'Resumen del mes',
+                loc.monthlySummary,
                 style: tt.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: cs.onSurface,
@@ -75,7 +77,7 @@ class MonthlyOverview extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Balance',
+                    loc.balanceLabel,
                     style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ),
@@ -104,7 +106,7 @@ class MonthlyOverview extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              '${((expense / income) * 100).toStringAsFixed(0)}% de tus ingresos gastados',
+              loc.incomePercentage(((expense / income) * 100).toStringAsFixed(0)),
               style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
             ),
           ],

@@ -7,6 +7,7 @@ import 'package:gastos_personales/layers/movements/domain/entity/movement.dart';
 import 'package:gastos_personales/layers/products/data/products_repository_impl.dart';
 import 'package:gastos_personales/layers/products/data/source/network/products_api.dart';
 import 'package:gastos_personales/layers/products/domain/usecase/get_products.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/navigation/route.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_app_bar.dart';
 
@@ -79,6 +80,7 @@ class _SelectProductPageState extends State<SelectProductPage> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final loc = AppLocalizations.of(context)!;
     final filtered = _filteredProducts;
 
     return Scaffold(
@@ -88,14 +90,14 @@ class _SelectProductPageState extends State<SelectProductPage> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: SettingsAppBar(title: 'Agregar producto'),
+              child: SettingsAppBar(title: loc.addProductTitle),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: TextField(
                 controller: _searchCtrl,
                 decoration: InputDecoration(
-                  hintText: 'Buscar productos...',
+                  hintText: loc.searchProducts,
                   prefixIcon: const Icon(Icons.search),
                   filled: true,
                   fillColor: cs.surfaceContainerLow,

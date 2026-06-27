@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_app_bar.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_group_card.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_section_header.dart';
@@ -20,54 +21,55 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
-            const SettingsAppBar(title: 'Notificaciones'),
+            SettingsAppBar(title: loc.notificationSettings),
             const SizedBox(height: 16),
-            const SettingsSectionHeader(title: 'Canales'),
+            SettingsSectionHeader(title: loc.channelsSection),
             SettingsGroupCard(
               rows: [
                 SettingsSwitchRow(
                   icon: Icons.notifications_none,
-                  title: 'Push',
-                  subtitle: 'Notificaciones en el dispositivo',
+                  title: loc.pushChannel,
+                  subtitle: loc.pushSubtitle,
                   value: _pushEnabled,
                   onChanged: (v) => setState(() => _pushEnabled = v),
                 ),
                 SettingsSwitchRow(
                   icon: Icons.mail_outline,
-                  title: 'Email',
-                  subtitle: 'Notificaciones al correo',
+                  title: loc.emailChannel,
+                  subtitle: loc.emailSubtitle,
                   value: _emailEnabled,
                   onChanged: (v) => setState(() => _emailEnabled = v),
                 ),
                 SettingsSwitchRow(
                   icon: Icons.sms_outlined,
-                  title: 'SMS',
-                  subtitle: 'Notificaciones por mensaje de texto',
+                  title: loc.smsChannel,
+                  subtitle: loc.smsSubtitle,
                   value: _smsEnabled,
                   onChanged: (v) => setState(() => _smsEnabled = v),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            const SettingsSectionHeader(title: 'Alertas'),
+            SettingsSectionHeader(title: loc.alertsSection),
             SettingsGroupCard(
               rows: [
                 SettingsSwitchRow(
                   icon: Icons.payment_outlined,
-                  title: 'Recordatorios de pago',
-                  subtitle: 'Antes de la fecha de vencimiento',
+                  title: loc.paymentReminders,
+                  subtitle: loc.paymentRemindersSubtitle,
                   value: _paymentReminders,
                   onChanged: (v) => setState(() => _paymentReminders = v),
                 ),
                 SettingsSwitchRow(
                   icon: Icons.assessment_outlined,
-                  title: 'Resumen semanal',
-                  subtitle: 'Cada lunes recibirás un resumen',
+                  title: loc.weeklySummaryTitle,
+                  subtitle: loc.weeklySummarySubtitle,
                   value: _weeklySummary,
                   onChanged: (v) => setState(() => _weeklySummary = v),
                 ),

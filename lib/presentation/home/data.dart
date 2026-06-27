@@ -12,13 +12,13 @@ final List<String> menuRoutes = [
 final List<MenuModel> menus = [
   MenuModel(
     idMenu: 1,
-    nombre: 'Inicio',
+    nombre: '',
     icono: 'dashboard',
     url: '/pages/dashboard',
   ),
   MenuModel(
     idMenu: 2,
-    nombre: 'Movimientos',
+    nombre: '',
     icono: 'movs',
     url: '/pages/movements',
   ),
@@ -30,13 +30,13 @@ final List<MenuModel> menus = [
   ),
    MenuModel(
     idMenu: 4,
-    nombre: 'Reportes',
+    nombre: '',
     icono: 'reports',
     url: '/pages/reports',
   ),
   MenuModel(
     idMenu: 5,
-    nombre: 'Perfil',
+    nombre: '',
     icono: 'profile',
     url: '/pages/profile',
   ),

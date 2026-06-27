@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_bloc.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_event.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_state.dart';
@@ -50,6 +51,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
@@ -88,7 +90,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Edit profile',
+                    loc.editProfileTitle,
                     style: tt.headlineMedium?.copyWith(color: cs.onSurface),
                   ),
                 ],
@@ -101,36 +103,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: Column(
                   children: [
                     _buildField(
-                      label: 'First name',
+                      label: loc.firstname,
                       controller: _firstNameCtrl,
                       icon: Icons.person_outline,
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
-                          return 'First name is required';
+                          return loc.firstnameRequired;
                         }
                         if (v.trim().length < 2) {
-                          return 'Minimum 2 characters';
+                          return loc.firstnameMin;
                         }
                         if (v.trim().length > 100) {
-                          return 'Maximum 100 characters';
+                          return loc.firstnameMax;
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 16),
                     _buildField(
-                      label: 'Last name',
+                      label: loc.lastname,
                       controller: _lastNameCtrl,
                       icon: Icons.person_outline,
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
-                          return 'Last name is required';
+                          return loc.lastnameRequired;
                         }
                         if (v.trim().length < 2) {
-                          return 'Minimum 2 characters';
+                          return loc.lastnameMin;
                         }
                         if (v.trim().length > 100) {
-                          return 'Maximum 100 characters';
+                          return loc.lastnameMax;
                         }
                         return null;
                       },
@@ -159,7 +161,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 color: Theme.of(context).colorScheme.onPrimary,
                               ),
                             )
-                          : const Text('Save changes'),
+                          : Text(loc.saveChangesButton),
                     ),
                   );
                 },
@@ -169,7 +171,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: Text(loc.cancel),
                 ),
               ),
             ],

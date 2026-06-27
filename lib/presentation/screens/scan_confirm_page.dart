@@ -5,6 +5,7 @@ import 'package:gastos_personales/layers/products/data/products_repository_impl.
 import 'package:gastos_personales/layers/products/data/source/network/products_api.dart';
 import 'package:gastos_personales/layers/products/domain/usecase/create_product.dart';
 import 'package:gastos_personales/layers/scanner/domain/entity/product_scan_result.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/bloc/product_form/product_form_bloc.dart';
 
 class ScanConfirmPage extends StatelessWidget {
@@ -72,11 +73,12 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
 
   void _onSave() {
     if (_hasSaved) return;
+    final loc = AppLocalizations.of(context)!;
 
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un nombre')),
+        SnackBar(content: Text(loc.enterName)),
       );
       return;
     }
@@ -97,7 +99,7 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
         name: editedResult.name,
         description: editedResult.presentation.isNotEmpty
             ? editedResult.presentation
-            : 'Detectado por OCR',
+            : loc.detectedByOcr,
         unitPrice: editedResult.price,
       ),
     );
@@ -106,12 +108,13 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
     return BlocConsumer<ProductFormBloc, ProductFormState>(
       listener: (context, state) {
         if (state is ProductFormSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Producto guardado correctamente.'),
+              content: Text(loc.productSaved),
               backgroundColor: cs.tertiary,
             ),
           );
@@ -131,7 +134,7 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Confirmar datos'),
+            title: Text(loc.confirmDataTitle),
             centerTitle: true,
           ),
           body: SingleChildScrollView(
@@ -140,7 +143,7 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Revisa los datos detectados por el escáner.',
+                  loc.confirmDataMessage,
                   style: TextStyle(
                     fontSize: 14,
                     color: cs.onSurfaceVariant,
@@ -150,7 +153,7 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
-                    labelText: 'Nombre del producto',
+                    labelText: loc.productNameLabel,
                     border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                 ),
@@ -158,7 +161,7 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
                 TextFormField(
                   controller: _presentationController,
                   decoration: InputDecoration(
-                    labelText: 'Presentación',
+                    labelText: loc.presentationLabel,
                     border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                 ),
@@ -170,7 +173,7 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                   ],
                   decoration: InputDecoration(
-                    labelText: 'Precio',
+                    labelText: loc.priceLabel,
                     prefixText: '\$ ',
                     border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
@@ -187,14 +190,14 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
                             color: cs.surfaceContainerLowest,
                           ),
                         )
-                      : const Text('Guardar producto'),
+                      : Text(loc.saveProduct),
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton(
                   onPressed: isLoading
                       ? null
                       : () => Navigator.pop(context, false),
-                  child: const Text('Volver a escanear'),
+                  child: Text(loc.rescan),
                 ),
               ],
             ),

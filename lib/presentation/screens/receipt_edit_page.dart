@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 
 class ReceiptEditPage extends StatefulWidget {
   final String imagePath;
@@ -38,10 +39,11 @@ class _ReceiptEditPageState extends State<ReceiptEditPage> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Revisar factura'),
+        title: Text(loc.reviewReceipt),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -77,15 +79,15 @@ class _ReceiptEditPageState extends State<ReceiptEditPage> {
                 controller: _totalController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
-                  labelText: 'Total detectado',
-                  hintText: '0.00',
+                  labelText: loc.detectedTotal,
+                  hintText: loc.hintAmount,
                   prefixText: '\$ ',
                   border: const OutlineInputBorder(),
                 ),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Ingresa el total';
+                  if (v == null || v.trim().isEmpty) return loc.enterTotal;
                   final parsed = double.tryParse(v.trim().replaceAll(',', '.'));
-                  if (parsed == null || parsed <= 0) return 'Ingresa un monto válido';
+                  if (parsed == null || parsed <= 0) return loc.enterValidTotal;
                   return null;
                 },
               ),
@@ -94,7 +96,7 @@ class _ReceiptEditPageState extends State<ReceiptEditPage> {
 
               // OCR text preview
               Text(
-                'TEXTO DETECTADO',
+                loc.detectedText,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -112,7 +114,7 @@ class _ReceiptEditPageState extends State<ReceiptEditPage> {
                   color: cs.surfaceContainerLowest,
                 ),
                 child: Text(
-                  widget.ocrText.isEmpty ? 'Sin texto detectado' : widget.ocrText,
+                  widget.ocrText.isEmpty ? loc.noTextDetected : widget.ocrText,
                   style: TextStyle(
                     fontSize: 13,
                     color: cs.onSurface,
@@ -136,14 +138,14 @@ class _ReceiptEditPageState extends State<ReceiptEditPage> {
                   }
                 },
                 icon: const Icon(Icons.check),
-                label: const Text('Confirmar factura'),
+                label: Text(loc.confirmReceipt),
               ),
 
               const SizedBox(height: 12),
 
               OutlinedButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
+                child: Text(loc.cancel),
               ),
             ],
           ),

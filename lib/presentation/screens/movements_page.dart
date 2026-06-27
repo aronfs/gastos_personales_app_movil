@@ -4,6 +4,7 @@ import 'package:gastos_personales/layers/movements/data/movements_repository_imp
 import 'package:gastos_personales/layers/movements/data/source/network/movements_api.dart';
 import 'package:gastos_personales/layers/movements/domain/entity/movement.dart';
 import 'package:gastos_personales/layers/movements/domain/usecase/get_movements.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/bloc/movements/movements_bloc.dart';
 
 /// Punto de entrada: provee el [MovementsBloc].
@@ -42,6 +43,7 @@ class _MovementsViewState extends State<_MovementsView> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
@@ -76,7 +78,7 @@ class _MovementsViewState extends State<_MovementsView> {
                               MovementsSearchChanged(v),
                             ),
                             decoration: InputDecoration(
-                              hintText: 'Buscar movimiento...',
+                              hintText: loc.searchMovement,
                               prefixIcon: Icon(
                                 Icons.search,
                                 color: cs.onSurfaceVariant,
@@ -128,7 +130,7 @@ class _MovementsViewState extends State<_MovementsView> {
                             ),
                             child: Center(
                               child: Text(
-                                cat,
+                                cat == 'Todos' ? loc.all : cat,
                                 style: tt.labelMedium?.copyWith(
                                   color: selected ? cs.onPrimary : cs.onSurface,
                                 ),
@@ -143,7 +145,7 @@ class _MovementsViewState extends State<_MovementsView> {
                 ],
 
                 // ── Cuerpo: loading / error / lista ─────────────────────
-                Expanded(child: _buildBody(context, state)),
+                Expanded(child: _buildBody(context, state, loc)),
               ],
             );
           },
@@ -152,7 +154,7 @@ class _MovementsViewState extends State<_MovementsView> {
     );
   }
 
-  Widget _buildBody(BuildContext context, MovementsState state) {
+  Widget _buildBody(BuildContext context, MovementsState state, AppLocalizations loc) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
@@ -182,7 +184,7 @@ class _MovementsViewState extends State<_MovementsView> {
                   const MovementsFetchRequested(),
                 ),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Reintentar'),
+                label: Text(loc.retry),
               ),
             ],
           ),
@@ -196,7 +198,7 @@ class _MovementsViewState extends State<_MovementsView> {
     if (loaded.filtered.isEmpty) {
       return Center(
         child: Text(
-          'Sin movimientos',
+          loc.noMovements,
           style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
         ),
       );
@@ -211,7 +213,7 @@ class _MovementsViewState extends State<_MovementsView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${loaded.filtered.length} movimiento${loaded.filtered.length != 1 ? 's' : ''}',
+                loc.movementCount(loaded.filtered.length),
                 style: tt.labelSmall?.copyWith(
                   color: cs.onSurfaceVariant,
                   fontWeight: FontWeight.w700,

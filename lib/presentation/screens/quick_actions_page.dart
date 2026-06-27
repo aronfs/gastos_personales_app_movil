@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/navigation/route.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_app_bar.dart';
 
@@ -8,21 +9,22 @@ class QuickActionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: SettingsAppBar(title: 'Acciones rápidas'),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: SettingsAppBar(title: loc.quickActions),
             ),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                '¿Qué deseas hacer?',
+                loc.quickActionsHeading,
                 style: TextStyle(
                   fontSize: 14,
                   color: cs.onSurfaceVariant,
@@ -40,43 +42,43 @@ class QuickActionsPage extends StatelessWidget {
                 children: [
                   _ActionCard(
                     icon: Icons.arrow_downward,
-                    label: 'Nuevo ingreso',
-                    description: 'Registrar un ingreso',
+                    label: loc.newIncome,
+                    description: loc.registerIncome,
                     color: cs.tertiary,
                     onTap: () => Navigator.pushNamed(context, newIncome),
                   ),
                   _ActionCard(
                     icon: Icons.arrow_upward,
-                    label: 'Nuevo gasto',
-                    description: 'Registrar un gasto',
+                    label: loc.newExpense,
+                    description: loc.recordExpense,
                     color: cs.primary,
                     onTap: () => Navigator.pushNamed(context, newExpense),
                   ),
                   _ActionCard(
                     icon: Icons.shopping_cart_outlined,
-                    label: 'Gasto supermercado',
-                    description: 'Compra en supermercado',
+                    label: loc.supermarketExpense,
+                    description: loc.supermarketPurchase,
                     color: const Color(0xFFC8923B),
                     onTap: () => Navigator.pushNamed(context, supermarketExpense),
                   ),
                   _ActionCard(
                     icon: Icons.inventory_2_outlined,
-                    label: 'Nuevo producto',
-                    description: 'Agregar un producto',
+                    label: loc.newProduct,
+                    description: loc.addProductAction,
                     color: cs.onSurfaceVariant,
                     onTap: () => Navigator.pushNamed(context, newProduct),
                   ),
                   _ActionCard(
                     icon: Icons.qr_code_scanner,
-                    label: 'Escanear producto',
-                    description: 'Leer código de barras',
+                    label: loc.scanProduct,
+                    description: loc.readBarcode,
                     color: const Color(0xFF673AB7),
                     onTap: () => Navigator.pushNamed(context, scanBarcode),
                   ),
                   _ActionCard(
                     icon: Icons.receipt_long_outlined,
-                    label: 'Escanear facturas',
-                    description: 'OCR para facturas',
+                    label: loc.scanReceipts,
+                    description: loc.ocrReceipts,
                     color: cs.tertiary,
                     onTap: () => Navigator.pushNamed(context, receiptScanner),
                   ),

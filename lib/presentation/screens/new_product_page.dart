@@ -9,6 +9,7 @@ import 'package:gastos_personales/layers/products/data/products_repository_impl.
 import 'package:gastos_personales/layers/products/data/source/network/products_api.dart';
 import 'package:gastos_personales/layers/products/domain/usecase/create_product.dart';
 import 'package:gastos_personales/presentation/screens/bloc/product_form/product_form_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/widgets/icon_circle_avatar.dart';
 import 'package:gastos_personales/presentation/screens/widgets/inline_input_field.dart';
 import 'package:gastos_personales/presentation/screens/widgets/labeled_text_field.dart';
@@ -74,12 +75,13 @@ class _NewProductPageState extends State<NewProductPage> {
   }
 
   Future<void> _pickCategory() async {
+    final loc = AppLocalizations.of(context)!;
     if (_categories.isEmpty) {
       setState(() => _loadingCategories = true);
       await _loadCategories();
       if (_categories.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No hay categorías disponibles o no se cargaron correctamente')),
+          SnackBar(content: Text(loc.noCategoriesError)),
         );
         return;
       }
@@ -94,9 +96,9 @@ class _NewProductPageState extends State<NewProductPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text('Seleccionar Categoría', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                child: Text(loc.selectProduct, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               ),
               const Divider(height: 1),
               Flexible(
@@ -139,16 +141,17 @@ class _NewProductPageState extends State<NewProductPage> {
   }
 
   void _submit(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     if (_selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona una categoría')),
+        SnackBar(content: Text(loc.selectCategoryProductError)),
       );
       return;
     }
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un nombre')),
+        SnackBar(content: Text(loc.enterNameError)),
       );
       return;
     }
@@ -156,7 +159,7 @@ class _NewProductPageState extends State<NewProductPage> {
     final price = double.tryParse(rawPrice);
     if (price == null || price <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un precio válido')),
+        SnackBar(content: Text(loc.enterValidPriceError)),
       );
       return;
     }
@@ -173,6 +176,7 @@ class _NewProductPageState extends State<NewProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final repo = ProductsRepositoryImpl(ProductsApiImpl());
 
     return BlocProvider(
@@ -191,8 +195,8 @@ class _NewProductPageState extends State<NewProductPage> {
           final cs = Theme.of(context).colorScheme;
           final loading = state is ProductFormLoading;
           final categoryName = _loadingCategories
-              ? 'Cargando...'
-              : (_selectedCategory?.name ?? 'Seleccionar');
+              ? loc.loadingDots
+              : (_selectedCategory?.name ?? loc.selectCategoryProduct);
 
           return Scaffold(
             backgroundColor: cs.surface,
@@ -200,7 +204,7 @@ class _NewProductPageState extends State<NewProductPage> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
-                  const SettingsAppBar(title: 'Nuevo producto'),
+                  SettingsAppBar(title: loc.newProduct),
                   const SizedBox(height: 24),
                   Center(
                     child: IconCircleAvatar(
@@ -211,17 +215,17 @@ class _NewProductPageState extends State<NewProductPage> {
                   ),
                   const SizedBox(height: 28),
                   LabeledTextField(
-                    label: 'Nombre',
+                    label: loc.productName,
                     controller: _nameController,
-                    hintText: 'Ej. Arroz',
+                    hintText: loc.hintProductName,
                     prefixIcon: Icons.sell_outlined,
                     prefixIconColor: cs.onSurfaceVariant,
                   ),
                   const SizedBox(height: 16),
                   LabeledTextField(
-                    label: 'Descripción',
+                    label: loc.productDescription,
                     controller: _descController,
-                    hintText: 'Ej. Arroz integral 1kg',
+                    hintText: loc.hintProductDescription,
                     prefixIcon: Icons.description_outlined,
                     prefixIconColor: cs.onSurfaceVariant,
                   ),
@@ -234,7 +238,7 @@ class _NewProductPageState extends State<NewProductPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'PRECIO UNITARIO',
+                              loc.unitPriceLabel,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
@@ -290,7 +294,7 @@ class _NewProductPageState extends State<NewProductPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'CATEGORÍA',
+                              loc.categoryLabel,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
@@ -312,13 +316,13 @@ class _NewProductPageState extends State<NewProductPage> {
                   ),
                   const SizedBox(height: 20),
                   ProductPreviewCard(
-                    name: _nameController.text.isEmpty ? 'Nombre' : _nameController.text,
-                    description: _descController.text.isEmpty ? 'Descripción' : _descController.text,
+                    name: _nameController.text.isEmpty ? loc.productPreviewName : _nameController.text,
+                    description: _descController.text.isEmpty ? loc.productPreviewDescription : _descController.text,
                     priceLabel: _priceLabel,
                   ),
                   const SizedBox(height: 24),
                   PrimaryActionButton(
-                    label: loading ? 'Creando...' : 'Crear producto',
+                    label: loading ? loc.creatingDots : loc.createProduct,
                     onPressed: loading ? null : () => _submit(context),
                   ),
                 ],

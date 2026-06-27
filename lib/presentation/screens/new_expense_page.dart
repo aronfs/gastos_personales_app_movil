@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/categories/data/categories_repository_impl.dart';
 import 'package:gastos_personales/layers/categories/data/source/network/categories_api.dart';
 import 'package:gastos_personales/layers/categories/domain/entity/category.dart';
@@ -106,22 +107,23 @@ class _NewExpensePageState extends State<NewExpensePage> {
   }
 
   void _submit(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final amount = double.tryParse(_amountController.text.replaceAll(',', '.'));
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un monto válido')),
+        SnackBar(content: Text(loc.enterValidAmount)),
       );
       return;
     }
     if (_selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona una categoría')),
+        SnackBar(content: Text(loc.selectCategoryError)),
       );
       return;
     }
     if (_descriptionController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa una descripción')),
+        SnackBar(content: Text(loc.enterDescription)),
       );
       return;
     }
@@ -158,6 +160,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
           }
         },
         builder: (context, state) {
+          final loc = AppLocalizations.of(context)!;
           final loading = state is ExpenseFormLoading;
           final cs = Theme.of(context).colorScheme;
 
@@ -167,11 +170,11 @@ class _NewExpensePageState extends State<NewExpensePage> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
                   SettingsAppBar(
-                    title: _isEditing ? 'Editar gasto' : 'Nuevo gasto',
+                    title: _isEditing ? loc.editExpense : loc.newExpense,
                   ),
                   const SizedBox(height: 24),
                   AmountHeader(
-                    label: 'Monto',
+                    label: loc.expenseAmount,
                     prefixSign: '\$',
                     amountText: _amountController.text.isEmpty
                         ? '0.00'
@@ -196,7 +199,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
 
                   // ── Fecha (calendario inline) ──
                   InlineCalendarPicker(
-                    label: 'Fecha',
+                    label: loc.date,
                     selectedDate: _selectedDate,
                     icon: Icons.calendar_today_outlined,
                     iconBackgroundColor: cs.primary.withValues(alpha: 0.15),
@@ -213,8 +216,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                     controller: _descriptionController,
                     enabled: !loading,
                     decoration: InputDecoration(
-                      labelText: 'Descripción',
-                      hintText: 'Ej: Almuerzo en restaurante',
+                      labelText: loc.description,
+                      hintText: loc.hintDescriptionExpense,
                       prefixIcon: Padding(
                         padding: const EdgeInsets.only(left: 14, right: 10),
                         child: Container(
@@ -256,8 +259,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                           RegExp(r'^\d*\.?\d{0,2}')),
                     ],
                     decoration: InputDecoration(
-                      labelText: 'Monto',
-                      hintText: '0.00',
+                      labelText: loc.expenseAmount,
+                      hintText: loc.hintAmount,
                       prefixIcon: Padding(
                         padding: const EdgeInsets.only(left: 14, right: 10),
                         child: Container(
@@ -291,20 +294,20 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   const SizedBox(height: 16),
                   DashedActionButton(
                     icon: Icons.camera_alt_outlined,
-                    label: 'Adjuntar comprobante',
+                    label: loc.attachReceipt,
                     onPressed: () {},
                   ),
                   const SizedBox(height: 28),
                   PrimaryActionButton(
                     label: loading
-                        ? 'Guardando...'
-                        : (_isEditing ? 'Actualizar gasto' : 'Guardar gasto'),
+                        ? loc.savingDots
+                        : (_isEditing ? loc.updateExpense : loc.saveExpense),
                     color: cs.primary,
                     onPressed: loading ? null : () => _submit(context),
                   ),
                   const SizedBox(height: 8),
                   SecondaryActionButton(
-                    label: 'Cancelar',
+                    label: loc.cancel,
                     onPressed: loading
                         ? null
                         : () => Navigator.of(context).maybePop(),
@@ -312,7 +315,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   if (_isEditing) ...[
                     const SizedBox(height: 8),
                     DestructiveActionButton(
-                      label: 'Eliminar gasto',
+                      label: loc.deleteExpenseAction,
                       onPressed: loading
                           ? null
                           : () => context.read<ExpenseFormBloc>().add(
@@ -334,6 +337,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
   // ─────────────────────────────────────────────
 
   Widget _buildCategorySectionHeader(ColorScheme cs) {
+    final loc = AppLocalizations.of(context)!;
     final categoryColor = _selectedCategory != null
         ? colorFromHex(_selectedCategory!.color)
         : cs.onSurfaceVariant;
@@ -361,7 +365,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
           child: Row(
             children: [
               Text(
-                'CATEGORÍA',
+                loc.categorySection,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -397,6 +401,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
   }
 
   Widget _buildCategoryPreview(ColorScheme cs) {
+    final loc = AppLocalizations.of(context)!;
     final categoryColor = _selectedCategory != null
         ? colorFromHex(_selectedCategory!.color)
         : cs.onSurfaceVariant;
@@ -422,7 +427,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  'Cargando categorías...',
+                  loc.loadingCategories,
                   style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
                 ),
               ],
@@ -441,7 +446,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  _selectedCategory?.name ?? 'Seleccionar',
+                  _selectedCategory?.name ?? loc.selectCategory,
                   style: TextStyle(
                     fontSize: 13,
                     color: _selectedCategory != null
@@ -458,6 +463,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
   }
 
   Widget _buildCategoryGrid(ColorScheme cs) {
+    final loc = AppLocalizations.of(context)!;
     if (_categories.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -468,7 +474,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
         ),
         child: Center(
           child: Text(
-            'No hay categorías disponibles',
+            loc.noCategoriesAvailable,
             style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
           ),
         ),

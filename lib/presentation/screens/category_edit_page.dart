@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gastos_personales/layers/categories/domain/entity/category.dart';
 import 'package:gastos_personales/presentation/screens/bloc/categories/categories_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/util/color_helper.dart';
 import 'package:gastos_personales/util/icon_helper.dart';
 
@@ -73,6 +74,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
 
     return BlocListener<CategoriesBloc, CategoriesState>(
       listener: (context, state) {
@@ -81,7 +83,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Categoría actualizada correctamente.'),
+              content: Text(loc.categoryUpdateSuccess),
               backgroundColor: cs.tertiary,
             ),
           );
@@ -106,7 +108,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Editar categoría'),
+          title: Text(loc.editCategory),
           centerTitle: true,
         ),
         body: SingleChildScrollView(
@@ -119,18 +121,18 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
-                    labelText: 'Nombre',
+                    labelText: loc.categoryName,
                     border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                   validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'El nombre es obligatorio' : null,
+                      (v == null || v.trim().isEmpty) ? loc.categoryNameRequired : null,
                 ),
                 const SizedBox(height: 24),
 
                 // ── Selector de ícono expandible ──
                 _buildSectionHeader(
                   cs: cs,
-                  title: 'ICONO',
+                  title: loc.iconLabel,
                   trailing: Text(
                     _iconValue,
                     style: TextStyle(
@@ -161,7 +163,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
                 // ── Selector de color expandible ──
                 _buildSectionHeader(
                   cs: cs,
-                  title: 'COLOR',
+                  title: loc.colorLabel,
                   trailing: Text(
                     _colorValue,
                     style: TextStyle(
@@ -199,7 +201,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
                             color: cs.surfaceContainerLowest,
                           ),
                         )
-                      : const Text('Guardar Cambios'),
+                      : Text(loc.saveChanges),
                 ),
               ],
             ),

@@ -22,6 +22,7 @@ import 'package:gastos_personales/presentation/screens/widgets/inline_editable_f
 import 'package:gastos_personales/presentation/screens/widgets/primary_action_button.dart';
 import 'package:gastos_personales/presentation/screens/widgets/section_header_with_action.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_app_bar.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/util/transaction_ui_helper.dart';
 import 'package:gastos_personales/navigation/route.dart';
 
@@ -105,9 +106,10 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
   }
 
   void _submit(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     if (_descController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa una descripción')),
+        SnackBar(content: Text(loc.enterDescriptionSupermarket)),
       );
       return;
     }
@@ -136,9 +138,10 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
         }
       },
       builder: (context, state) {
+        final loc = AppLocalizations.of(context)!;
         bool isLoading = state is SupermarketFormLoading || state is SupermarketFormSubmitting;
         double total = 0.0;
-        String categoryName = 'Cargando...';
+        String categoryName = loc.loadingDots;
         List<CartItem> cart = [];
         List<Product> availableProducts = [];
         List<Category> categories = [];
@@ -146,7 +149,7 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
 
         if (state is SupermarketFormLoaded) {
           total = state.cart.fold(0.0, (sum, item) => sum + item.subtotal);
-          categoryName = state.selectedCategory?.name ?? 'Seleccionar categoría';
+          categoryName = state.selectedCategory?.name ?? loc.selectCategorySupermarket;
           cart = state.cart;
           availableProducts = state.availableProducts;
           categories = state.categories;
@@ -159,10 +162,10 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
-                const SettingsAppBar(title: 'Gasto supermercado'),
+                SettingsAppBar(title: loc.supermarketExpense),
                 const SizedBox(height: 20),
                 AmountHeader(
-                  label: 'Cupo restante',
+                  label: loc.remainingBudget,
                   prefixSign: '\$',
                   amountText: (baseCupo - total).toStringAsFixed(2),
                   amountColor: (baseCupo - total) < 0 ? cs.error : cs.onSurface,
@@ -170,7 +173,7 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
                 const SizedBox(height: 8),
                 Center(
                   child: Text(
-                    'Total carrito: \$${total.toStringAsFixed(2)}',
+                    '${loc.totalCart} \$${total.toStringAsFixed(2)}',
                     style: tt.bodyMedium?.copyWith(
                       color: cs.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
@@ -181,7 +184,7 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
 
                 _FieldCard(
                   icon: Icons.shopping_cart_outlined,
-                  label: 'Categoría',
+                  label: loc.supermarketCategory,
                   value: categoryName,
                   isExpanded: _categoryExpanded,
                   isLoading: isLoading,
@@ -202,16 +205,16 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
 
                 InlineEditableFieldRow(
                   icon: Icons.description_outlined,
-                  label: 'Descripción',
+                  label: loc.supermarketDescription,
                   controller: _descController,
-                  hintText: 'Compra Supermaxi',
+                  hintText: loc.hintSupermarketDescription,
                   enabled: !isLoading,
                 ),
                 const SizedBox(height: 24),
 
                 SectionHeaderWithAction(
-                  title: 'Productos',
-                  actionLabel: '+ Agregar',
+                  title: loc.products,
+                  actionLabel: loc.addProduct,
                   onActionTap: isLoading ? () {} : () => _pickProduct(context, availableProducts),
                 ),
                 const SizedBox(height: 12),
@@ -221,7 +224,7 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
                     padding: const EdgeInsets.symmetric(vertical: 32),
                     child: Center(
                       child: Text(
-                        'Presiona "+ Agregar" para añadir productos',
+                        loc.emptyCartMessage,
                         style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                       ),
                     ),
@@ -253,7 +256,7 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
                   ],
                 const SizedBox(height: 32),
                 PrimaryActionButton(
-                  label: state is SupermarketFormSubmitting ? 'Guardando...' : 'Guardar',
+                  label: state is SupermarketFormSubmitting ? loc.savingDots : loc.save,
                   color: cs.primary,
                   onPressed: isLoading ? null : () => _submit(context),
                 ),

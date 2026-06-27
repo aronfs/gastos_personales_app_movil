@@ -1,19 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 
 enum ReportPeriod { semana, mes, anio }
-
-extension ReportPeriodLabel on ReportPeriod {
-  String get label {
-    switch (this) {
-      case ReportPeriod.semana:
-        return 'Semana';
-      case ReportPeriod.mes:
-        return 'Mes';
-      case ReportPeriod.anio:
-        return 'Año';
-    }
-  }
-}
 
 /// Selector segmentado tipo "pill" para elegir el periodo del reporte.
 class PeriodSelector extends StatelessWidget {
@@ -29,6 +17,7 @@ class PeriodSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -60,7 +49,7 @@ class PeriodSelector extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  period.label,
+                  _labelFor(loc, period),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -73,5 +62,16 @@ class PeriodSelector extends StatelessWidget {
         }).toList(),
       ),
     );
+  }
+
+  String _labelFor(AppLocalizations loc, ReportPeriod period) {
+    switch (period) {
+      case ReportPeriod.semana:
+        return loc.periodWeek;
+      case ReportPeriod.mes:
+        return loc.periodMonth;
+      case ReportPeriod.anio:
+        return loc.periodYear;
+    }
   }
 }

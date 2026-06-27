@@ -62,27 +62,27 @@ class _SignupViewState extends State<_SignupView> {
   bool _validate() {
     final loc = AppLocalizations.of(context)!;
     if (_firstNameCtrl.text.trim().isEmpty) {
-      _showError(loc.labelName.isNotEmpty ? 'Ingresa tu nombre' : loc.labelName);
+      _showError(loc.enterYourName);
       return false;
     }
     if (_lastNameCtrl.text.trim().isEmpty) {
-      _showError('Ingresa tu apellido');
+      _showError(loc.enterYourLastName);
       return false;
     }
     if (_emailCtrl.text.trim().isEmpty || !_emailCtrl.text.contains('@')) {
-      _showError('Ingresa un email válido');
+      _showError(loc.enterValidEmail);
       return false;
     }
     if (_passwordCtrl.text.isEmpty) {
-      _showError('Ingresa una contraseña');
+      _showError(loc.enterPassword);
       return false;
     }
     if (_passwordCtrl.text.length < 6) {
-      _showError('La contraseña debe tener al menos 6 caracteres');
+      _showError(loc.passwordMinLength);
       return false;
     }
     if (_passwordCtrl.text != _confirmCtrl.text) {
-      _showError('Las contraseñas no coinciden');
+      _showError(loc.passwordsDontMatch);
       return false;
     }
     return true;
@@ -158,7 +158,7 @@ class _SignupViewState extends State<_SignupView> {
                   const SizedBox(height: 30),
 
                   // ── First Name ─────────────────────────
-                  LabelForm(label: 'Nombre'),
+                  LabelForm(label: loc.labelName),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _firstNameCtrl,
@@ -168,13 +168,13 @@ class _SignupViewState extends State<_SignupView> {
                         padding: EdgeInsets.all(20),
                         child: FaIcon(FontAwesomeIcons.user),
                       ),
-                      hintText: 'Tu nombre',
+                      hintText: loc.hintName,
                     ),
                   ),
                   const SizedBox(height: 8),
 
                   // ── Last Name ──────────────────────────
-                  LabelForm(label: 'Apellido'),
+                  LabelForm(label: loc.lastName),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _lastNameCtrl,
@@ -184,7 +184,7 @@ class _SignupViewState extends State<_SignupView> {
                         padding: EdgeInsets.all(20),
                         child: FaIcon(FontAwesomeIcons.user),
                       ),
-                      hintText: 'Tu apellido',
+                      hintText: loc.hintLastName,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -282,8 +282,8 @@ class _SignupViewState extends State<_SignupView> {
 
                   // ── Hint: Already have account? ──────────
                   HintLabel(
-                    label1: '¿Ya tienes cuenta? ',
-                    label2: 'Inicia sesión',
+                    label1: loc.alreadyHaveAccount,
+                    label2: loc.signIn,
                     toPage: signin,
                   ),
                   const SizedBox(height: 20),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gastos_personales/main.dart' show themeNotifier;
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_group_card.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_navigation_row.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_section_header.dart';
@@ -23,6 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
   static const _currencies = ['USD — \$', 'EUR — €', 'PEN — S/.', 'MXN — \$'];
 
   void _showLanguagePicker() {
+    final loc = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     showModalBottomSheet(
       context: context,
@@ -43,7 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Idioma',
+              loc.languagePickerTitle,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 8),
@@ -66,6 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showCurrencyPicker() {
+    final loc = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     showModalBottomSheet(
       context: context,
@@ -86,7 +89,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Moneda',
+              loc.currencyPickerTitle,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 8),
@@ -110,47 +113,48 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           children: [
-            const SettingsSectionHeader(title: 'Apariencia'),
+            SettingsSectionHeader(title: loc.appearance),
             SettingsGroupCard(
               rows: [
                 SettingsSwitchRow(
                   icon: Icons.dark_mode_outlined,
-                  title: 'Tema oscuro',
+                  title: loc.darkMode,
                   value: themeNotifier.value == ThemeMode.dark,
                   onChanged: (v) => themeNotifier.value = v ? ThemeMode.dark : ThemeMode.light,
                 ),
                 SettingsNavigationRow(
                   icon: Icons.language,
-                  title: 'Idioma',
+                  title: loc.language,
                   value: _language,
                   onTap: _showLanguagePicker,
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            const SettingsSectionHeader(title: 'Preferencias'),
+            SettingsSectionHeader(title: loc.preferences),
             SettingsGroupCard(
               rows: [
                 SettingsNavigationRow(
                   icon: Icons.credit_card_outlined,
-                  title: 'Moneda',
+                  title: loc.currency,
                   value: _currency,
                   onTap: _showCurrencyPicker,
                 ),
                 SettingsSwitchRow(
                   icon: Icons.notifications_none,
-                  title: 'Notificaciones push',
+                  title: loc.pushNotifications,
                   value: _pushNotifications,
                   onChanged: (v) => setState(() => _pushNotifications = v),
                 ),
                 SettingsSwitchRow(
                   icon: Icons.mail_outline,
-                  title: 'Resumen semanal\npor email',
+                  title: loc.weeklyEmailSummary,
                   value: _weeklyEmailSummary,
                   onChanged: (v) => setState(() => _weeklyEmailSummary = v),
                 ),

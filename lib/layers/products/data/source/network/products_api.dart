@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:gastos_personales/data/dio_client.dart';
 import 'package:gastos_personales/layers/movements/data/dto/movement_dto.dart';
 import 'package:gastos_personales/layers/movements/domain/entity/movement.dart';
 import 'package:gastos_personales/util/api_endpoints.dart';
-import 'package:gastos_personales/util/token_storage.dart';
 
 abstract class ProductsApi {
   Future<List<Product>> getProducts({String? categoryId});
@@ -10,12 +10,7 @@ abstract class ProductsApi {
 }
 
 class ProductsApiImpl implements ProductsApi {
-  final Dio _dio = Dio();
-
-  Future<Map<String, String>> _headers() async {
-    final token = await TokenStorage.getToken();
-    return {'Authorization': 'Bearer $token'};
-  }
+  final Dio _dio = DioClient().dio;
 
   @override
   Future<List<Product>> getProducts({String? categoryId}) async {
@@ -23,7 +18,6 @@ class ProductsApiImpl implements ProductsApi {
       final response = await _dio.get(
         ApiEndpoints.product,
         queryParameters: categoryId != null ? {'categoryId': categoryId} : null,
-        options: Options(headers: await _headers()),
       );
       final data = (response.data as Map<String, dynamic>)['data'] as List;
       return data.map((e) => ProductDto.fromMap(e as Map<String, dynamic>)).toList();
@@ -40,7 +34,6 @@ class ProductsApiImpl implements ProductsApi {
       final response = await _dio.post(
         ApiEndpoints.product,
         data: body,
-        options: Options(headers: await _headers()),
       );
       return ProductDto.fromMap(
         (response.data as Map<String, dynamic>)['data']

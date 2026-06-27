@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:gastos_personales/data/dio_client.dart';
 import 'package:gastos_personales/layers/login/data/dto/login_response.dart';
 import 'package:gastos_personales/util/api_endpoints.dart';
 import 'package:gastos_personales/util/biometric_service.dart';
+import 'package:gastos_personales/util/session_manager.dart';
 import 'package:gastos_personales/util/token_storage.dart';
 
 class AuthRepository {
@@ -28,12 +30,12 @@ class AuthRepository {
   Future<LoginResponse> refreshSession() async {
     final refreshToken = await TokenStorage.getRefreshToken();
     if (refreshToken == null || refreshToken.isEmpty) {
-      await TokenStorage.clearAll();
+      await SessionManager().forceLogout();
       throw Exception('Sesión expirada. Inicia sesión nuevamente.');
     }
 
     try {
-      final dio = Dio();
+      final dio = DioClient().dio;
       final response = await dio.post(
         ApiEndpoints.authRefresh,
         data: {'refreshToken': refreshToken},
@@ -53,7 +55,7 @@ class AuthRepository {
         sessionId: '',
       );
     } on DioException {
-      await TokenStorage.clearAll();
+      await SessionManager().forceLogout();
       throw Exception('Sesión expirada. Inicia sesión nuevamente.');
     }
   }

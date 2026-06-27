@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/expenses/data/expenses_repository_impl.dart';
 import 'package:gastos_personales/layers/expenses/data/source/network/expenses_api.dart';
 import 'package:gastos_personales/layers/expenses/domain/usecase/delete_expense.dart';
@@ -56,19 +57,20 @@ class _ExpensesViewState extends State<_ExpensesView> {
   }
 
   Future<void> _confirmDelete(BuildContext context, Movement expense) async {
+    final loc = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar gasto'),
-        content: Text('¿Eliminar "${expense.description}"?'),
+        title: Text(loc.deleteExpense),
+        content: Text(loc.deleteExpenseConfirm(expense.description)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Eliminar', style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
+            child: Text(loc.delete, style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
           ),
         ],
       ),
@@ -80,6 +82,7 @@ class _ExpensesViewState extends State<_ExpensesView> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openForm(context),
@@ -95,10 +98,10 @@ class _ExpensesViewState extends State<_ExpensesView> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
                 children: [
-                  const SimplePageAppBar(title: 'Gastos'),
+                  SimplePageAppBar(title: loc.expenseReports),
                   const SizedBox(height: 16),
                   SearchFilterBar(
-                    hintText: 'Buscar gasto...',
+                    hintText: loc.searchExpense,
                     controller: _searchController,
                     onChanged: (value) => context.read<ExpensesBloc>().add(
                       ExpensesSearchChanged(value),
@@ -125,6 +128,7 @@ class _ExpensesViewState extends State<_ExpensesView> {
   }
 
   List<Widget> _buildBody(BuildContext context, ExpensesState state) {
+    final loc = AppLocalizations.of(context)!;
     if (state is ExpensesLoading || state is ExpensesInitial) {
       return [
         const SizedBox(height: 80),
@@ -144,7 +148,7 @@ class _ExpensesViewState extends State<_ExpensesView> {
                 onPressed: () => context.read<ExpensesBloc>().add(
                   const ExpensesFetchRequested(),
                 ),
-                child: const Text('Reintentar'),
+                child: Text(loc.retry),
               ),
             ],
           ),
@@ -156,7 +160,7 @@ class _ExpensesViewState extends State<_ExpensesView> {
     if (loaded.filtered.isEmpty) {
       return [
         const SizedBox(height: 40),
-        const Center(child: Text('Sin gastos registrados')),
+        Center(child: Text(loc.noExpenses)),
       ];
     }
 

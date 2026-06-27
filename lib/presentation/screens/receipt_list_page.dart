@@ -9,6 +9,7 @@ import 'package:gastos_personales/presentation/screens/bloc/receipt_scanner/rece
 import 'package:gastos_personales/presentation/screens/new_expense_page.dart';
 import 'package:gastos_personales/presentation/screens/receipt_capture_page.dart';
 import 'package:gastos_personales/presentation/screens/receipt_edit_page.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/widgets/expense_initial_data.dart';
 
 class ReceiptListPage extends StatelessWidget {
@@ -62,6 +63,7 @@ class _ReceiptListViewState extends State<_ReceiptListView> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
 
     return BlocBuilder<ReceiptScannerBloc, ReceiptScannerState>(
       builder: (context, state) {
@@ -70,33 +72,36 @@ class _ReceiptListViewState extends State<_ReceiptListView> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Escanear Facturas'),
+            title: Text(loc.receiptListTitle),
             centerTitle: true,
             actions: [
               if (receipts.isNotEmpty)
                 IconButton(
                   icon: const Icon(Icons.delete_sweep_outlined),
-                  tooltip: 'Limpiar lista',
+                  tooltip: loc.clearList,
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Limpiar lista'),
-                        content: const Text('¿Eliminar todas las facturas escaneadas?'),
+                      builder: (ctx) {
+                      final loc = AppLocalizations.of(ctx)!;
+                      return AlertDialog(
+                        title: Text(loc.clearListTitle),
+                        content: Text(loc.clearListConfirm),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx),
-                            child: const Text('Cancelar'),
+                            child: Text(loc.cancel),
                           ),
                           TextButton(
                             onPressed: () {
                               Navigator.pop(ctx);
                               context.read<ReceiptScannerBloc>().add(ReceiptClearAllRequested());
                             },
-                            child: Text('Limpiar', style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
+                            child: Text(loc.clear, style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
                           ),
                         ],
-                      ),
+                      );
+                    },
                     );
                   },
                 ),
@@ -113,12 +118,12 @@ class _ReceiptListViewState extends State<_ReceiptListView> {
                         Icon(Icons.receipt_long_outlined, size: 80, color: cs.onSurfaceVariant.withValues(alpha: 0.4)),
                         const SizedBox(height: 16),
                         Text(
-                          'No hay facturas escaneadas',
+                          loc.noReceipts,
                           style: TextStyle(fontSize: 18, color: cs.onSurfaceVariant),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Escanea o selecciona una factura\npara comenzar',
+                          loc.noReceiptsHint,
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant.withValues(alpha: 0.7)),
                         ),
@@ -147,7 +152,7 @@ class _ReceiptListViewState extends State<_ReceiptListView> {
                                 builder: (_) => NewExpensePage(
                                   initialData: ExpenseInitialData(
                                     amount: receipt.detectedTotal!,
-                                    description: 'Factura escaneada',
+                                    description: loc.scannedReceipt,
                                   ),
                                 ),
                               ),
@@ -171,7 +176,7 @@ class _ReceiptListViewState extends State<_ReceiptListView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'TOTAL ACUMULADO',
+                      loc.totalAccumulated,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -212,7 +217,7 @@ class _ReceiptListViewState extends State<_ReceiptListView> {
                         ));
                       },
                       icon: const Icon(Icons.camera_alt_outlined),
-                      label: const Text('Escanear'),
+                      label: Text(loc.scanButton),
                     ),
                   ),
                 ],
@@ -243,6 +248,7 @@ class _ReceiptListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
 
     final statusColor = switch (receipt.status) {
       ReceiptStatus.completed => cs.tertiary,
@@ -252,10 +258,10 @@ class _ReceiptListItem extends StatelessWidget {
     };
 
     final statusLabel = switch (receipt.status) {
-      ReceiptStatus.completed => 'Completado',
-      ReceiptStatus.needsReview => 'Requiere revisión',
-      ReceiptStatus.processing => 'Procesando',
-      ReceiptStatus.error => 'Error',
+      ReceiptStatus.completed => loc.statusCompleted,
+      ReceiptStatus.needsReview => loc.statusNeedsReview,
+      ReceiptStatus.processing => loc.statusProcessing,
+      ReceiptStatus.error => loc.statusError,
     };
 
     return Card(
@@ -323,7 +329,7 @@ class _ReceiptListItem extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          'Toca para revisar',
+                          loc.tapToReview,
                           style: TextStyle(fontSize: 11, color: Colors.orange.shade700),
                         ),
                       ),
@@ -335,7 +341,7 @@ class _ReceiptListItem extends StatelessWidget {
                           child: OutlinedButton.icon(
                             onPressed: onRegisterExpense,
                             icon: const Icon(Icons.add_shopping_cart_outlined, size: 16),
-                            label: const Text('Registrar gasto', style: TextStyle(fontSize: 13)),
+                            label: Text(loc.registerExpense, style: const TextStyle(fontSize: 13)),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 6),
                               visualDensity: VisualDensity.compact,

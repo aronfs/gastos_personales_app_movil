@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/categories/data/categories_repository_impl.dart';
 import 'package:gastos_personales/layers/categories/data/source/network/categories_api.dart';
 import 'package:gastos_personales/layers/categories/domain/entity/category.dart';
@@ -99,22 +100,23 @@ class _NewIncomePageState extends State<NewIncomePage> {
   }
 
   void _submit(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final amount = double.tryParse(_amountController.text.replaceAll(',', '.'));
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un monto válido')),
+        SnackBar(content: Text(loc.enterValidAmount)),
       );
       return;
     }
     if (_selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona una fuente')),
+        SnackBar(content: Text(loc.selectSourceError)),
       );
       return;
     }
     if (_descriptionController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa una descripción')),
+        SnackBar(content: Text(loc.enterDescriptionIncome)),
       );
       return;
     }
@@ -151,6 +153,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
           }
         },
         builder: (context, state) {
+          final loc = AppLocalizations.of(context)!;
           final loading = state is IncomeFormLoading;
           final cs = Theme.of(context).colorScheme;
 
@@ -160,11 +163,11 @@ class _NewIncomePageState extends State<NewIncomePage> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
                   SettingsAppBar(
-                    title: _isEditing ? 'Editar ingreso' : 'Nuevo ingreso',
+                    title: _isEditing ? loc.editIncome : loc.newIncome,
                   ),
                   const SizedBox(height: 24),
                   AmountHeader(
-                    label: 'Ingreso',
+                    label: loc.incomeLabel,
                     prefixSign: '+ \$',
                     amountText: _amountController.text.isEmpty
                         ? '0.00'
@@ -190,7 +193,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
 
                   // ── Fecha (calendario inline) ──
                   InlineCalendarPicker(
-                    label: 'Fecha',
+                    label: loc.date,
                     selectedDate: _selectedDate,
                     icon: Icons.calendar_today_outlined,
                     iconBackgroundColor: cs.tertiary.withValues(alpha: 0.15),
@@ -213,8 +216,8 @@ class _NewIncomePageState extends State<NewIncomePage> {
                           RegExp(r'^\d*\.?\d{0,2}')),
                     ],
                     decoration: InputDecoration(
-                      labelText: 'Monto',
-                      hintText: '0.00',
+                      labelText: loc.expenseAmount,
+                      hintText: loc.hintAmount,
                       prefixIcon: Padding(
                         padding: const EdgeInsets.only(left: 14, right: 10),
                         child: Container(
@@ -252,8 +255,8 @@ class _NewIncomePageState extends State<NewIncomePage> {
                     controller: _descriptionController,
                     enabled: !loading,
                     decoration: InputDecoration(
-                      labelText: 'Descripción',
-                      hintText: 'Ej: Venta de producto',
+                      labelText: loc.description,
+                      hintText: loc.hintDescriptionIncome,
                       prefixIcon: Padding(
                         padding: const EdgeInsets.only(left: 14, right: 10),
                         child: Container(
@@ -285,15 +288,15 @@ class _NewIncomePageState extends State<NewIncomePage> {
                   const SizedBox(height: 28),
                   PrimaryActionButton(
                     label: loading
-                        ? 'Guardando...'
+                        ? loc.savingDots
                         : (_isEditing
-                            ? 'Actualizar ingreso'
-                            : 'Registrar ingreso'),
+                            ? loc.updateIncome
+                            : loc.saveIncome),
                     onPressed: loading ? null : () => _submit(context),
                   ),
                   const SizedBox(height: 8),
                   SecondaryActionButton(
-                    label: 'Cancelar',
+                    label: loc.cancel,
                     onPressed: loading
                         ? null
                         : () => Navigator.of(context).maybePop(),
@@ -301,7 +304,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
                   if (_isEditing) ...[
                     const SizedBox(height: 8),
                     DestructiveActionButton(
-                      label: 'Eliminar ingreso',
+                      label: loc.deleteIncomeAction,
                       onPressed: loading
                           ? null
                           : () => context.read<IncomeFormBloc>().add(
@@ -323,6 +326,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
   // ─────────────────────────────────────────────
 
   Widget _buildCategorySectionHeader(ColorScheme cs) {
+    final loc = AppLocalizations.of(context)!;
     final categoryColor = _selectedCategory != null
         ? colorFromHex(_selectedCategory!.color)
         : cs.onSurfaceVariant;
@@ -350,7 +354,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
           child: Row(
             children: [
               Text(
-                'FUENTE',
+                loc.incomeSource,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -386,6 +390,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
   }
 
   Widget _buildCategoryPreview(ColorScheme cs) {
+    final loc = AppLocalizations.of(context)!;
     final categoryColor = _selectedCategory != null
         ? colorFromHex(_selectedCategory!.color)
         : cs.onSurfaceVariant;
@@ -411,7 +416,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  'Cargando fuentes...',
+                  loc.loadingSources,
                   style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
                 ),
               ],
@@ -430,7 +435,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  _selectedCategory?.name ?? 'Seleccionar',
+                  _selectedCategory?.name ?? loc.selectSource,
                   style: TextStyle(
                     fontSize: 13,
                     color: _selectedCategory != null
@@ -447,6 +452,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
   }
 
   Widget _buildCategoryGrid(ColorScheme cs) {
+    final loc = AppLocalizations.of(context)!;
     if (_categories.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -457,7 +463,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
         ),
         child: Center(
           child: Text(
-            'No hay fuentes disponibles',
+            loc.noSourcesAvailable,
             style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
           ),
         ),

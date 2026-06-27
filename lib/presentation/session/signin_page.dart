@@ -117,22 +117,20 @@ class _SigninViewState extends State<_SigninView> {
   }
 
   Future<void> _showEnrollBiometricDialog(BuildContext context) async {
+    final loc = AppLocalizations.of(context)!;
     final goToSettings = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Registrar huella digital'),
-        content: const Text(
-          'No hay huellas registradas en el dispositivo. '
-          'Ve a Ajustes > Seguridad y registra una huella para usar esta función.',
-        ),
+        title: Text(loc.fingerprintNotRegisteredTitle),
+        content: Text(loc.fingerprintNotRegisteredMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(loc.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Ir a Ajustes'),
+            child: Text(loc.goToSettings),
           ),
         ],
       ),
@@ -143,22 +141,21 @@ class _SigninViewState extends State<_SigninView> {
   }
 
   Future<void> _onLoginSuccess(BuildContext context) async {
+    final loc = AppLocalizations.of(context)!;
     if (!_biometricEnabled && mounted) {
       final accept = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('¿Activar huella digital?'),
-          content: const Text(
-            'Puedes usar tu huella digital para iniciar sesión más rápido sin contraseña.',
-          ),
+          title: Text(loc.enableFingerprintTitle),
+          content: Text(loc.enableFingerprintMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Ahora no'),
+              child: Text(loc.notNow),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Activar'),
+              child: Text(loc.enable),
             ),
           ],
         ),
@@ -172,8 +169,8 @@ class _SigninViewState extends State<_SigninView> {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                const SnackBar(
-                  content: Text('Huella digital activada correctamente'),
+                SnackBar(
+                  content: Text(loc.fingerprintActivated),
                 ),
               );
           }
@@ -366,7 +363,7 @@ class _SigninViewState extends State<_SigninView> {
                                 ),
                               )
                             : const Icon(Icons.fingerprint),
-                        label: const Text('Entrar con huella'),
+                        label: Text(loc.signInWithBiometric),
                       ),
                     ),
                     const SizedBox(height: 16),

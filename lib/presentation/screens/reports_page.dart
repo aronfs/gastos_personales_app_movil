@@ -7,6 +7,7 @@ import 'package:gastos_personales/layers/reports/domain/usecase/get_categories_r
 import 'package:gastos_personales/layers/reports/domain/usecase/get_monthly_report.dart';
 import 'package:gastos_personales/layers/reports/domain/usecase/get_yearly_report.dart';
 
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/bloc/reports/reports_bloc.dart';
 import 'package:gastos_personales/presentation/screens/widgets/category_distribution_card.dart';
 import 'package:gastos_personales/presentation/screens/widgets/category_share.dart';
@@ -136,6 +137,7 @@ class _MonthContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final loc = AppLocalizations.of(context)!;
     final s = monthly.summary;
 
     // Construir IncomeExpensePoints con las categorías del mes
@@ -168,7 +170,7 @@ class _MonthContent extends StatelessWidget {
               Icon(Icons.receipt_long_outlined, color: cs.primary, size: 20),
               const SizedBox(width: 8),
               Text(
-                '${s.transactionCount} transacciones en ${monthly.period.monthName}',
+                loc.transactionsCount(s.transactionCount, monthly.period.monthName),
                 style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
               ),
             ],
@@ -300,12 +302,13 @@ class _SummaryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
 
     return Row(
       children: [
         Expanded(
           child: _SummaryTile(
-            label: 'Ingresos',
+            label: loc.incomeReports,
             amount: income,
             color: cs.tertiary,
             icon: Icons.arrow_downward_rounded,
@@ -314,7 +317,7 @@ class _SummaryRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _SummaryTile(
-            label: 'Gastos',
+            label: loc.expenseReports,
             amount: expense,
             color: cs.error,
             icon: Icons.arrow_upward_rounded,
@@ -323,7 +326,7 @@ class _SummaryRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _SummaryTile(
-            label: 'Balance',
+            label: loc.balanceReports,
             amount: balance,
             color: cs.primary,
             icon: Icons.account_balance_wallet_outlined,
@@ -395,6 +398,7 @@ class _ErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final loc = AppLocalizations.of(context)!;
 
     return SizedBox(
       height: 300,
@@ -409,7 +413,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Reintentar'),
+              label: Text(loc.retry),
             ),
           ],
         ),
@@ -428,20 +432,21 @@ class _CategorySectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final loc = AppLocalizations.of(context)!;
 
     return Row(
       children: [
         Icon(Icons.category_outlined, size: 18, color: cs.onSurfaceVariant),
         const SizedBox(width: 6),
         Text(
-          'Categories',
+          loc.categoriesHeader,
           style: tt.titleSmall?.copyWith(color: cs.onSurfaceVariant),
         ),
         const Spacer(),
         TextButton.icon(
           onPressed: onManage,
           icon: const Icon(Icons.tune, size: 16),
-          label: const Text('Manage'),
+          label: Text(loc.manageButton),
           style: TextButton.styleFrom(
             visualDensity: VisualDensity.compact,
             foregroundColor: cs.primary,

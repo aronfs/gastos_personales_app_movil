@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gastos_personales/presentation/screens/widgets/primary_action_button.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/presentation/screens/widgets/secondary_action_button.dart';
 import 'package:gastos_personales/presentation/screens/widgets/settings_app_bar.dart';
 
@@ -27,24 +28,25 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   void _handleSave() {
+    final loc = AppLocalizations.of(context)!;
     if (_currentCtrl.text.isEmpty) {
-      _showError('Ingresa tu contraseña actual');
+      _showError(loc.enterCurrentPassword);
       return;
     }
     if (_newCtrl.text.isEmpty) {
-      _showError('Ingresa una nueva contraseña');
+      _showError(loc.enterNewPassword);
       return;
     }
     if (_newCtrl.text.length < 6) {
-      _showError('La nueva contraseña debe tener al menos 6 caracteres');
+      _showError(loc.newPasswordMinLength);
       return;
     }
     if (_newCtrl.text != _confirmCtrl.text) {
-      _showError('Las contraseñas no coinciden');
+      _showError(loc.passwordsDoNotMatch);
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Contraseña actualizada correctamente')),
+      SnackBar(content: Text(loc.passwordUpdated)),
     );
     Navigator.pop(context);
   }
@@ -57,22 +59,23 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
-            const SettingsAppBar(title: 'Cambiar contraseña'),
+            SettingsAppBar(title: loc.changePasswordTitle),
             const SizedBox(height: 24),
-            _buildField('Contraseña actual', _currentCtrl, _obscureCurrent, (v) => setState(() => _obscureCurrent = v)),
+            _buildField(loc.currentPassword, _currentCtrl, _obscureCurrent, (v) => setState(() => _obscureCurrent = v)),
             const SizedBox(height: 16),
-            _buildField('Nueva contraseña', _newCtrl, _obscureNew, (v) => setState(() => _obscureNew = v)),
+            _buildField(loc.newPassword, _newCtrl, _obscureNew, (v) => setState(() => _obscureNew = v)),
             const SizedBox(height: 16),
-            _buildField('Confirmar contraseña', _confirmCtrl, _obscureConfirm, (v) => setState(() => _obscureConfirm = v)),
+            _buildField(loc.confirmPassword, _confirmCtrl, _obscureConfirm, (v) => setState(() => _obscureConfirm = v)),
             const SizedBox(height: 32),
-            PrimaryActionButton(label: 'Guardar contraseña', onPressed: _handleSave),
+            PrimaryActionButton(label: loc.savePassword, onPressed: _handleSave),
             const SizedBox(height: 12),
-            SecondaryActionButton(label: 'Cancelar', onPressed: () => Navigator.pop(context)),
+            SecondaryActionButton(label: loc.cancel, onPressed: () => Navigator.pop(context)),
           ],
         ),
       ),

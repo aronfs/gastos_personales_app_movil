@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gastos_personales/l10n/app_localizations.dart';
 import 'package:gastos_personales/layers/categories/data/categories_repository_impl.dart';
 import 'package:gastos_personales/layers/categories/data/source/network/categories_api.dart';
 import 'package:gastos_personales/layers/categories/domain/usecase/create_category.dart';
@@ -28,6 +29,7 @@ class _InitialSetupView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -38,9 +40,7 @@ class _InitialSetupView extends StatelessWidget {
             if (state is InitialSetupSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text(
-                    'Categorías iniciales creadas correctamente.',
-                  ),
+                  content: Text(loc.initialCategoriesCreated),
                   backgroundColor: cs.tertiary,
                 ),
               );
@@ -80,16 +80,14 @@ class _InitialSetupView extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    '¡Bienvenido!',
+                    loc.welcomeTitle,
                     style: textTheme.headlineLarge?.copyWith(
                       color: cs.onSurface,
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Parece que todavía no tienes categorías. '
-                    'Vamos a crear unas básicas para que puedas comenzar '
-                    'a registrar tus ingresos y gastos.',
+                    loc.welcomeMessage,
                     textAlign: TextAlign.center,
                     style: textTheme.bodyMedium?.copyWith(
                       color: cs.onSurfaceVariant,
@@ -98,26 +96,26 @@ class _InitialSetupView extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
                   Text(
-                    'Se crearán las siguientes categorías:',
+                    loc.willCreateCategories,
                     style: textTheme.titleMedium?.copyWith(
                       color: cs.onSurface,
                     ),
                   ),
                   const SizedBox(height: 12),
                   _CategoryChip(
-                    label: 'Salario',
+                    label: loc.salary,
                     icon: Icons.attach_money,
                     color: const Color(0xFF3B82F6),
                   ),
                   const SizedBox(height: 8),
                   _CategoryChip(
-                    label: 'Alimentación',
+                    label: loc.food,
                     icon: Icons.restaurant,
                     color: const Color(0xFFEF4444),
                   ),
                   const SizedBox(height: 8),
                   _CategoryChip(
-                    label: 'Transporte',
+                    label: loc.transport,
                     icon: Icons.directions_car,
                     color: const Color(0xFFF97316),
                   ),
@@ -137,7 +135,7 @@ class _InitialSetupView extends StatelessWidget {
                               color: cs.onPrimary,
                             ),
                           )
-                        : const Text('Crear categorías iniciales'),
+                        : Text(loc.createInitialCategories),
                   ),
                 ],
               ),
