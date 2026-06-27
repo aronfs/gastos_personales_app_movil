@@ -5,37 +5,44 @@ import 'package:flutter/material.dart';
 class DateGroupHeader extends StatelessWidget {
   final String dateLabel;
   final String totalLabel;
-  final Color totalColor;
+  final Color? totalColor;
 
   const DateGroupHeader({
     super.key,
     required this.dateLabel,
     required this.totalLabel,
-    this.totalColor = const Color(0xFF1A1A2E),
+    this.totalColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final resolvedTotalColor = totalColor ?? cs.onSurface;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            dateLabel.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF9A9DB0),
-              letterSpacing: 0.3,
+          Expanded(
+            child: Text(
+              dateLabel.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: cs.onSurfaceVariant,
+                letterSpacing: 0.3,
+              ),
             ),
           ),
+          const SizedBox(width: 8),
           Text(
             totalLabel,
             style: TextStyle(
               fontSize: 13.5,
               fontWeight: FontWeight.w700,
-              color: totalColor,
+              color: resolvedTotalColor,
             ),
           ),
         ],

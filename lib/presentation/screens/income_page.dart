@@ -54,7 +54,7 @@ class _IncomeView extends StatelessWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text('Eliminar', style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
           ),
         ],
       ),
@@ -66,12 +66,13 @@ class _IncomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: cs.surfaceContainerLow,
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF34C759),
+        backgroundColor: cs.tertiary,
         onPressed: () => _openForm(context),
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: cs.surfaceContainerLowest),
       ),
       body: SafeArea(
         child: BlocBuilder<IncomesBloc, IncomesState>(

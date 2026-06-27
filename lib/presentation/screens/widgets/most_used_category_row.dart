@@ -15,6 +15,7 @@ class MostUsedCategoryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -33,19 +34,19 @@ class MostUsedCategoryRow extends StatelessWidget {
           Expanded(
             child: Text(
               category.name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1A1A2E),
+                color: cs.onSurface,
               ),
             ),
           ),
           Text(
             amountLabel,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1A1A2E),
+              color: cs.onSurface,
             ),
           ),
         ],

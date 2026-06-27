@@ -17,16 +17,17 @@ class MostUsedCategoriesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return ReportCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Más usadas',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1A1A2E),
+              color: cs.onSurface,
             ),
           ),
           const SizedBox(height: 8),

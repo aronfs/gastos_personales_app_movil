@@ -6,14 +6,12 @@ class DarkPageAppBar extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VoidCallback? onBack;
-  final VoidCallback? onNotificationsTap;
 
   const DarkPageAppBar({
     super.key,
     required this.title,
     this.subtitle,
     this.onBack,
-    this.onNotificationsTap,
   });
 
   @override
@@ -64,23 +62,6 @@ class DarkPageAppBar extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ],
-          ),
-        ),
-        Material(
-          color: cs.surfaceContainerHighest.withValues(alpha: 0.3),
-          shape: const CircleBorder(),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onNotificationsTap,
-            child: const SizedBox(
-              width: 40,
-              height: 40,
-              child: Icon(
-                Icons.notifications_none,
-                size: 20,
-                color: Colors.white,
-              ),
-            ),
           ),
         ),
       ],

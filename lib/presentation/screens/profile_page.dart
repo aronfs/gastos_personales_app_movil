@@ -3,18 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:gastos_personales/layers/profile/data/profile_repository_impl.dart';
 import 'package:gastos_personales/layers/profile/data/source/network/profile_api.dart';
-import 'package:gastos_personales/layers/profile/domain/usecase/deactivate_profile.dart';
 import 'package:gastos_personales/layers/profile/domain/usecase/delete_profile_image.dart';
 import 'package:gastos_personales/layers/profile/domain/usecase/get_profile.dart';
 import 'package:gastos_personales/layers/profile/domain/usecase/update_profile.dart';
 import 'package:gastos_personales/layers/profile/domain/usecase/upload_profile_image.dart';
+import 'package:gastos_personales/main.dart' show themeNotifier;
 import 'package:gastos_personales/presentation/providers/profile_provider.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_bloc.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_event.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_state.dart';
 import 'package:gastos_personales/presentation/screens/edit_profile_page.dart';
 import 'package:gastos_personales/navigation/route.dart';
-import 'package:gastos_personales/presentation/screens/widgets/deactivate_account_dialog.dart';
 import 'package:gastos_personales/presentation/screens/widgets/profile_avatar.dart';
 import 'package:gastos_personales/util/token_storage.dart';
 
@@ -30,7 +29,6 @@ class ProfilePage extends StatelessWidget {
           create: (_) => ProfileBloc(
             getProfile: GetProfile(repo),
             updateProfile: UpdateProfile(repo),
-            deactivateProfile: DeactivateProfile(repo),
             uploadProfileImage: UploadProfileImage(repo),
             deleteProfileImage: DeleteProfileImage(repo),
           )..add(const ProfileFetchRequested()),
@@ -162,7 +160,23 @@ class _ProfileViewState extends State<_ProfileView> {
             : '?';
 
         return Scaffold(
-          body: SafeArea(
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFF2563EB).withValues(alpha: 0.08),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SafeArea(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               children: [
@@ -209,14 +223,14 @@ class _ProfileViewState extends State<_ProfileView> {
                       // Name
                       Text(
                         profile.fullName,
-                        style: tt.headlineLarge?.copyWith(color: cs.surface),
+                        style: tt.headlineLarge?.copyWith(color: Colors.white),
                       ),
                       const SizedBox(height: 4),
                       // Email
                       Text(
                         profile.email,
                         style: tt.bodyMedium?.copyWith(
-                          color: cs.surface.withValues(alpha: 0.85),
+                          color: Colors.white.withValues(alpha: 0.85),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -235,17 +249,17 @@ class _ProfileViewState extends State<_ProfileView> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: cs.surface.withValues(alpha: 0.15),
+                                color: Colors.white.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(999),
                                 border: Border.all(
-                                  color: cs.surface.withValues(alpha: 0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
                               child: Text(
                                 label,
                                 style: tt.labelSmall?.copyWith(
-                                  color: cs.surface,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 0.5,
                                 ),
@@ -262,7 +276,7 @@ class _ProfileViewState extends State<_ProfileView> {
                         ),
                         decoration: BoxDecoration(
                           color: profile.active
-                              ? const Color(0xFF22C55E).withValues(alpha: 0.15)
+                              ? cs.tertiary.withValues(alpha: 0.15)
                               : cs.error.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(999),
                         ),
@@ -275,7 +289,7 @@ class _ProfileViewState extends State<_ProfileView> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: profile.active
-                                    ? const Color(0xFF22C55E)
+                                    ? cs.tertiary
                                     : cs.error,
                               ),
                             ),
@@ -284,7 +298,7 @@ class _ProfileViewState extends State<_ProfileView> {
                               profile.active ? 'Active' : 'Inactive',
                               style: tt.labelSmall?.copyWith(
                                 color: profile.active
-                                    ? const Color(0xFF22C55E)
+                                    ? cs.tertiary
                                     : cs.error,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -336,23 +350,17 @@ class _ProfileViewState extends State<_ProfileView> {
                 ],
                 const SizedBox(height: 10),
                 _ActionButton(
-                  icon: Icons.block_outlined,
-                  label: 'Deactivate account',
-                  textColor: cs.error,
-                  onTap: isOperationLoading
-                      ? null
-                      : () => showDialog(
-                          context: context,
-                          builder: (_) => DeactivateAccountDialog(
-                            onConfirm: () {
-                              context.read<ProfileBloc>().add(
-                                const ProfileDeactivateRequested(
-                                  confirmation: 'DEACTIVATE',
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                  icon: themeNotifier.value == ThemeMode.dark
+                      ? Icons.light_mode_outlined
+                      : Icons.dark_mode_outlined,
+                  label: themeNotifier.value == ThemeMode.dark
+                      ? 'Tema claro'
+                      : 'Tema oscuro',
+                  onTap: () {
+                    themeNotifier.value = themeNotifier.value == ThemeMode.dark
+                        ? ThemeMode.light
+                        : ThemeMode.dark;
+                  },
                 ),
                 const SizedBox(height: 10),
                 _ActionButton(
@@ -375,7 +383,9 @@ class _ProfileViewState extends State<_ProfileView> {
               ],
             ),
           ),
-        );
+        ],
+      ),
+    );
       },
     );
   }

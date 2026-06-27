@@ -169,7 +169,7 @@ class _NewIncomePageState extends State<NewIncomePage> {
                     amountText: _amountController.text.isEmpty
                         ? '0.00'
                         : _amountController.text,
-                    amountColor: const Color(0xFF2E9E4F),
+                    amountColor: cs.tertiary,
                   ),
                   const SizedBox(height: 28),
 
@@ -221,16 +221,16 @@ class _NewIncomePageState extends State<NewIncomePage> {
                           width: 42,
                           height: 42,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFD7F2EC),
+                            color: cs.tertiary.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             '+',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF1FAE8E),
+                              color: cs.tertiary,
                             ),
                           ),
                         ),
@@ -239,7 +239,9 @@ class _NewIncomePageState extends State<NewIncomePage> {
                         minWidth: 0,
                         minHeight: 0,
                       ),
-                      border: const OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: cs.outline),
+                      ),
                     ),
                   ),
 
@@ -258,14 +260,14 @@ class _NewIncomePageState extends State<NewIncomePage> {
                           width: 42,
                           height: 42,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE3E6FC),
+                            color: cs.primary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           alignment: Alignment.center,
-                          child: const Icon(
+                          child: Icon(
                             Icons.sell_outlined,
                             size: 20,
-                            color: Color(0xFF5B6BEE),
+                            color: cs.primary,
                           ),
                         ),
                       ),
@@ -273,7 +275,9 @@ class _NewIncomePageState extends State<NewIncomePage> {
                         minWidth: 0,
                         minHeight: 0,
                       ),
-                      border: const OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: cs.outline),
+                      ),
                     ),
                     textCapitalization: TextCapitalization.sentences,
                   ),
@@ -285,7 +289,6 @@ class _NewIncomePageState extends State<NewIncomePage> {
                         : (_isEditing
                             ? 'Actualizar ingreso'
                             : 'Registrar ingreso'),
-                    color: const Color(0xFF34C759),
                     onPressed: loading ? null : () => _submit(context),
                   ),
                   const SizedBox(height: 8),

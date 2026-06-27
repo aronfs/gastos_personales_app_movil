@@ -80,9 +80,9 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
           _hasSaved = true;
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Categoría actualizada correctamente.'),
-              backgroundColor: Color(0xFF43A047),
+            SnackBar(
+              content: const Text('Categoría actualizada correctamente.'),
+              backgroundColor: cs.tertiary,
             ),
           );
           Navigator.pop(context, true);
@@ -92,7 +92,7 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: cs.error,
             ),
           );
           if (state.message.contains('Sesión expirada') && mounted) {
@@ -118,9 +118,9 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Nombre',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                   validator: (v) =>
                       (v == null || v.trim().isEmpty) ? 'El nombre es obligatorio' : null,
@@ -191,12 +191,12 @@ class _CategoryEditPageState extends State<CategoryEditPage> {
                 FilledButton(
                   onPressed: _isSaving ? null : _onSave,
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: cs.surfaceContainerLowest,
                           ),
                         )
                       : const Text('Guardar Cambios'),

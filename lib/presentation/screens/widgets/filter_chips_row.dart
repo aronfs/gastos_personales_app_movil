@@ -6,18 +6,20 @@ class FilterChipsRow extends StatelessWidget {
   final List<String> options;
   final String selected;
   final ValueChanged<String> onSelected;
-  final Color activeColor;
+  final Color? activeColor;
 
   const FilterChipsRow({
     super.key,
     required this.options,
     required this.selected,
     required this.onSelected,
-    this.activeColor = const Color(0xFF2962FF),
+    this.activeColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final resolvedActiveColor = activeColor ?? cs.primary;
     return SizedBox(
       height: 38,
       child: ListView.separated(
@@ -34,7 +36,7 @@ class FilterChipsRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: isSelected ? activeColor : const Color(0xFFEDEEF3),
+                color: isSelected ? resolvedActiveColor : cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -42,7 +44,7 @@ class FilterChipsRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? Colors.white : const Color(0xFF4A4D5E),
+                  color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
                 ),
               ),
             ),

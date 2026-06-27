@@ -6,13 +6,11 @@ import 'package:flutter/material.dart';
 class SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBack;
-  final VoidCallback? onNotificationsTap;
 
   const SettingsAppBar({
     super.key,
     required this.title,
     this.onBack,
-    this.onNotificationsTap,
   });
 
   @override
@@ -42,13 +40,6 @@ class SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
                 color: cs.onSurface,
               ),
             ),
-          ),
-          _CircleIconButton(
-            icon: Icons.notifications_none,
-            iconSize: 20,
-            color: cs.onSurface,
-            bgColor: cs.surfaceContainerLow,
-            onTap: onNotificationsTap,
           ),
         ],
       ),

@@ -23,6 +23,7 @@ class ShortcutsTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Row(
       children: tabs.asMap().entries.map((entry) {
         final int idx = entry.key;
@@ -41,7 +42,7 @@ class ShortcutsTabBar extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: isActive
-                    ? const Color(0xFFEDEEF3)
+                    ? cs.surfaceContainerHigh
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -52,17 +53,17 @@ class ShortcutsTabBar extends StatelessWidget {
                     tab.icon,
                     size: 18,
                     color: isActive
-                        ? const Color(0xFF1A1A2E)
-                        : const Color(0xFFB7BAC6),
+                        ? cs.onSurface
+                        : cs.onSurfaceVariant,
                   ),
                   if (isActive && tab.label != null) ...[
                     const SizedBox(width: 6),
                     Text(
                       tab.label!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1A1A2E),
+                        color: cs.onSurface,
                       ),
                     ),
                   ],

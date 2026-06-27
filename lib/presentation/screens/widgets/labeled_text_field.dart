@@ -26,25 +26,26 @@ class LabeledTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           label.toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF9A9DB0),
+            color: cs.onSurfaceVariant,
             letterSpacing: 0.4,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: cs.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFEEF0F4), width: 1),
+            border: Border.all(color: cs.outlineVariant, width: 1),
           ),
           child: Row(
             children: [
@@ -54,7 +55,7 @@ class LabeledTextField extends StatelessWidget {
                   child: Icon(
                     prefixIcon,
                     size: 18,
-                    color: prefixIconColor ?? const Color(0xFF9A9DB0),
+                    color: prefixIconColor ?? cs.onSurfaceVariant,
                   ),
                 ),
               Expanded(
@@ -63,15 +64,15 @@ class LabeledTextField extends StatelessWidget {
                   controller: controller,
                   onChanged: onChanged,
                   keyboardType: keyboardType,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A2E),
+                    color: cs.onSurface,
                   ),
                   decoration: InputDecoration(
                     hintText: hintText,
-                    hintStyle: const TextStyle(
-                      color: Color(0xFFB7BAC6),
+                    hintStyle: TextStyle(
+                      color: cs.onSurfaceVariant,
                       fontSize: 15,
                     ),
                     contentPadding: const EdgeInsets.symmetric(

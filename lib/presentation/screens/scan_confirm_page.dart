@@ -105,13 +105,14 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return BlocConsumer<ProductFormBloc, ProductFormState>(
       listener: (context, state) {
         if (state is ProductFormSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Producto guardado correctamente.'),
-              backgroundColor: Color(0xFF43A047),
+            SnackBar(
+              content: const Text('Producto guardado correctamente.'),
+              backgroundColor: cs.tertiary,
             ),
           );
           Navigator.pop(context, true);
@@ -120,14 +121,13 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: cs.error,
             ),
           );
         }
       },
       builder: (context, state) {
         final isLoading = state is ProductFormLoading;
-        final cs = Theme.of(context).colorScheme;
 
         return Scaffold(
           appBar: AppBar(
@@ -149,17 +149,17 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
                 const SizedBox(height: 24),
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Nombre del producto',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _presentationController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Presentación',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -169,22 +169,22 @@ class _ScanConfirmFormState extends State<_ScanConfirmForm> {
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                   ],
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Precio',
                     prefixText: '\$ ',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                 ),
                 const SizedBox(height: 32),
                 FilledButton(
                   onPressed: isLoading ? null : _onSave,
                   child: isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: cs.surfaceContainerLowest,
                           ),
                         )
                       : const Text('Guardar producto'),

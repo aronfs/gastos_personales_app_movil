@@ -236,7 +236,9 @@ class _NewExpensePageState extends State<NewExpensePage> {
                         minWidth: 0,
                         minHeight: 0,
                       ),
-                      border: const OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: cs.outline),
+                      ),
                     ),
                     textCapitalization: TextCapitalization.sentences,
                   ),
@@ -280,7 +282,9 @@ class _NewExpensePageState extends State<NewExpensePage> {
                         minWidth: 0,
                         minHeight: 0,
                       ),
-                      border: const OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: cs.outline),
+                      ),
                     ),
                   ),
 

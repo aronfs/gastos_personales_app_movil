@@ -16,22 +16,23 @@ class ProductPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F8FC),
+        color: cs.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE4E6F0), width: 1),
+        border: Border.all(color: cs.outlineVariant, width: 1),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'VISTA PREVIA',
             style: TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF9A9DB0),
+              color: cs.onSurfaceVariant,
               letterSpacing: 0.4,
             ),
           ),
@@ -42,14 +43,14 @@ class ProductPreviewCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF2F3F7),
+                  color: cs.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 alignment: Alignment.center,
-                child: const Icon(
+                child: Icon(
                   Icons.inventory_2_outlined,
                   size: 18,
-                  color: Color(0xFF4A4D5E),
+                  color: cs.onSurfaceVariant,
                 ),
               ),
               const SizedBox(width: 12),
@@ -59,10 +60,10 @@ class ProductPreviewCard extends StatelessWidget {
                   children: [
                     Text(
                       name.isEmpty ? 'Nombre del producto' : name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A2E),
+                        color: cs.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -70,9 +71,9 @@ class ProductPreviewCard extends StatelessWidget {
                       description.isEmpty
                           ? 'Descripción'
                           : description,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12.5,
-                        color: Color(0xFF9A9DB0),
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -80,10 +81,10 @@ class ProductPreviewCard extends StatelessWidget {
               ),
               Text(
                 priceLabel.isEmpty ? '\$ 0.00' : priceLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF2E9E4F),
+                  color: cs.tertiary,
                 ),
               ),
             ],

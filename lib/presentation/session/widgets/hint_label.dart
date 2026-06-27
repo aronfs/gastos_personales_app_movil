@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:gastos_personales/ui.theme/design_tokens.dart';
 import 'package:gastos_personales/ui.theme/styles/text_style_app.dart';
 
@@ -19,16 +19,17 @@ class HintLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(top: Spacing.lg),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(label1, style: textStyleGrey.body14),
+          Text(label1, style: textStyleGrey(cs).body14),
 
           GestureDetector(
             onTap: () => onTap(toPage, context),
-            child: Text(label2, style: textStyleBlack.body14),
+            child: Text(label2, style: textStyleBlack(cs).body14),
           ),
         ],
       ),

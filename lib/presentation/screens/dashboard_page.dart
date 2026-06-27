@@ -10,7 +10,7 @@ import 'package:gastos_personales/presentation/screens/bloc/dashboard/dashboard_
 import 'package:gastos_personales/presentation/screens/widgets/balance_card.dart';
 import 'package:gastos_personales/presentation/screens/widgets/category_summary_card.dart';
 import 'package:gastos_personales/presentation/screens/widgets/profile_bar.dart';
-import 'package:gastos_personales/presentation/screens/widgets/saving_row.dart';
+import 'package:gastos_personales/presentation/screens/widgets/monthly_overview.dart';
 
 /// Punto de entrada: provee el [DashboardBloc].
 class DashboardPage extends StatelessWidget {
@@ -123,16 +123,13 @@ class _DashboardView extends StatelessWidget {
                     ),
                   ),
 
-                  // ── Ahorros del mes ──────────────────────────────────
+                  // ── Resumen del mes ──────────────────────────────────
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 35),
-                    child: SavingsRow(
-                      title: loc.saving,
-                      subtitle: loc.goal,
-                      valueSaving: summary.monthlyBalance,
-                      valueGoal: summary.totalIncome > 0
-                          ? (summary.monthlyBalance / summary.totalIncome) * 100
-                          : 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: MonthlyOverview(
+                      income: summary.monthlyIncome,
+                      expense: summary.monthlyExpense,
+                      balance: summary.monthlyBalance,
                     ),
                   ),
                   const SizedBox(height: 20),

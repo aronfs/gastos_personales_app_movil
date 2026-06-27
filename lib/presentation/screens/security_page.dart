@@ -112,7 +112,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 const SnackBar(content: Text('Sesiones cerradas correctamente')),
               );
             },
-            child: const Text('Cerrar todo', style: TextStyle(color: Colors.red)),
+            child: Text('Cerrar todo', style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
           ),
         ],
       ),

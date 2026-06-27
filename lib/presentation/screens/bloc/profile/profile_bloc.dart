@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gastos_personales/layers/profile/domain/usecase/deactivate_profile.dart';
 import 'package:gastos_personales/layers/profile/domain/usecase/delete_profile_image.dart';
 import 'package:gastos_personales/layers/profile/domain/usecase/get_profile.dart';
 import 'package:gastos_personales/layers/profile/domain/usecase/update_profile.dart';
@@ -10,20 +9,17 @@ import 'package:gastos_personales/presentation/screens/bloc/profile/profile_stat
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetProfile _getProfile;
   final UpdateProfile _updateProfile;
-  final DeactivateProfile _deactivateProfile;
   final UploadProfileImage _uploadProfileImage;
   final DeleteProfileImage _deleteProfileImage;
 
   ProfileBloc({
     required this._getProfile,
     required this._updateProfile,
-    required this._deactivateProfile,
     required this._uploadProfileImage,
     required this._deleteProfileImage,
   }) : super(const ProfileInitial()) {
     on<ProfileFetchRequested>(_onFetch);
     on<ProfileUpdateRequested>(_onUpdate);
-    on<ProfileDeactivateRequested>(_onDeactivate);
     on<ProfileImageUploadRequested>(_onUploadImage);
     on<ProfileImageDeleteRequested>(_onDeleteImage);
   }
@@ -59,29 +55,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         message: 'Profile updated successfully',
         profile: profile,
       ));
-    } catch (e) {
-      emit(ProfileError(
-        message: e.toString(),
-        profile: currentProfile,
-      ));
-    }
-  }
-
-  Future<void> _onDeactivate(ProfileDeactivateRequested event, Emitter<ProfileState> emit) async {
-    final currentState = state;
-    final currentProfile = currentState is ProfileLoaded
-        ? currentState.profile
-        : (currentState is ProfileOperationLoading
-            ? currentState.profile
-            : null);
-
-    if (currentProfile != null) {
-      emit(ProfileOperationLoading(profile: currentProfile));
-    }
-
-    try {
-      await _deactivateProfile(confirmation: event.confirmation);
-      emit(const ProfileSuccess(message: 'Profile deactivated successfully'));
     } catch (e) {
       emit(ProfileError(
         message: e.toString(),

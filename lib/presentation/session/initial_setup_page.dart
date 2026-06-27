@@ -37,11 +37,11 @@ class _InitialSetupView extends StatelessWidget {
           listener: (context, state) {
             if (state is InitialSetupSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
+                SnackBar(
+                  content: const Text(
                     'Categorías iniciales creadas correctamente.',
                   ),
-                  backgroundColor: Color(0xFF43A047),
+                  backgroundColor: cs.tertiary,
                 ),
               );
               Navigator.pushNamedAndRemoveUntil(

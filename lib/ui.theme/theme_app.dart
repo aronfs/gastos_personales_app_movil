@@ -130,7 +130,7 @@ class AppTheme {
         unselectedLabelStyle: textTheme.labelSmall,
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: cs.surfaceContainerLowest,
+        backgroundColor: isLight ? cs.surfaceContainerLowest : cs.surfaceContainerHigh,
         selectedColor: cs.primary,
         labelStyle: textTheme.labelMedium,
         padding: EdgeInsets.symmetric(
@@ -142,7 +142,7 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: cs.surfaceContainerLowest,
+        color: isLight ? cs.surfaceContainerLowest : cs.surfaceContainerHigh,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: RadiusTokens.xl,
@@ -157,9 +157,7 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         backgroundColor: cs.inverseSurface,
         contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: cs.inverseSurface == const Color(0xFF0F172A)
-              ? Colors.white
-              : Colors.black,
+          color: cs.brightness == Brightness.light ? Colors.white : Colors.black,
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: RadiusTokens.lg),

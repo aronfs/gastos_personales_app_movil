@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class FormFieldRow extends StatelessWidget {
   final IconData icon;
-  final Color iconBackgroundColor;
-  final Color iconColor;
+  final Color? iconBackgroundColor;
+  final Color? iconColor;
   final String label;
   final String value;
   final VoidCallback? onTap;
@@ -13,8 +13,8 @@ class FormFieldRow extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.value,
-    this.iconBackgroundColor = const Color(0xFFF2F3F7),
-    this.iconColor = const Color(0xFF2A2D3A),
+    this.iconBackgroundColor,
+    this.iconColor,
     this.onTap,
   });
 
@@ -41,11 +41,11 @@ class FormFieldRow extends StatelessWidget {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: iconBackgroundColor,
+                  color: iconBackgroundColor ?? cs.surfaceContainerLow,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: Icon(icon, size: 20, color: iconColor),
+                child: Icon(icon, size: 20, color: iconColor ?? cs.onSurfaceVariant),
               ),
               const SizedBox(width: 14),
               Expanded(

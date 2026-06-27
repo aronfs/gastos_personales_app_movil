@@ -15,9 +15,9 @@ import 'package:gastos_personales/layers/dashboard/data/dashboard_repository_imp
 import 'package:gastos_personales/layers/dashboard/data/source/network/dashboard_api.dart';
 import 'package:gastos_personales/layers/dashboard/domain/usecase/get_dashboard.dart';
 import 'package:gastos_personales/presentation/screens/bloc/supermarket_form/supermarket_form_bloc.dart';
+import 'package:gastos_personales/presentation/screens/select_product_page.dart';
 import 'package:gastos_personales/presentation/screens/widgets/amount_header.dart';
 import 'package:gastos_personales/presentation/screens/widgets/cart_product_row.dart';
-import 'package:gastos_personales/presentation/screens/widgets/form_field_row.dart';
 import 'package:gastos_personales/presentation/screens/widgets/inline_editable_field_row.dart';
 import 'package:gastos_personales/presentation/screens/widgets/primary_action_button.dart';
 import 'package:gastos_personales/presentation/screens/widgets/section_header_with_action.dart';
@@ -49,102 +49,53 @@ class _SupermarketExpenseView extends StatefulWidget {
   State<_SupermarketExpenseView> createState() => _SupermarketExpenseViewState();
 }
 
-class _SupermarketExpenseViewState extends State<_SupermarketExpenseView> {
+class _SupermarketExpenseViewState extends State<_SupermarketExpenseView>
+    with SingleTickerProviderStateMixin {
   final _descController = TextEditingController(text: 'Compra supermercado');
+  bool _categoryExpanded = false;
+  late AnimationController _animCtrl;
+  late Animation<double> _expandAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+    _expandAnim = CurvedAnimation(parent: _animCtrl, curve: Curves.easeInOut);
+  }
 
   @override
   void dispose() {
     _descController.dispose();
+    _animCtrl.dispose();
     super.dispose();
   }
 
-  void _pickCategory(BuildContext context, List<Category> categories) async {
-    final picked = await showModalBottomSheet<Category>(
-      context: context,
-      builder: (ctx) => ListView(
-        children: categories
-            .map((c) => ListTile(
-                  title: Text(c.name),
-                  onTap: () => Navigator.pop(ctx, c),
-                ))
-            .toList(),
-      ),
-    );
-    if (picked != null && context.mounted) {
-      context.read<SupermarketFormBloc>().add(SupermarketFormCategorySelected(picked));
-    }
+  void _toggleCategory(List<Category> categories) {
+    if (categories.isEmpty) return;
+    setState(() {
+      _categoryExpanded = !_categoryExpanded;
+      if (_categoryExpanded) {
+        _animCtrl.forward();
+      } else {
+        _animCtrl.reverse();
+      }
+    });
   }
 
-  void _pickProduct(BuildContext context, List<Product> availableProducts) async {
-    final picked = await showModalBottomSheet<Product>(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) => SafeArea(
-        child: Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Productos', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextButton.icon(
-                          icon: const Icon(Icons.qr_code_scanner, size: 18, color: Color(0xFF673AB7)),
-                          label: const Text('Escanear', style: TextStyle(fontSize: 13, color: Color(0xFF673AB7))),
-                          onPressed: () {
-                            Navigator.pop(ctx);
-                            Navigator.pushNamed(context, scanBarcode).then((_) {
-                              if (context.mounted) {
-                                context.read<SupermarketFormBloc>().add(SupermarketFormFetchRequested());
-                              }
-                            });
-                          },
-                        ),
-                        TextButton.icon(
-                          icon: const Icon(Icons.add, size: 18),
-                          label: const Text('Crear', style: TextStyle(fontSize: 13)),
-                          onPressed: () {
-                            Navigator.pop(ctx);
-                            Navigator.pushNamed(context, newProduct).then((_) {
-                              if (context.mounted) {
-                                context.read<SupermarketFormBloc>().add(SupermarketFormFetchRequested());
-                              }
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-              if (availableProducts.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: Text('No hay productos en esta categoría.'),
-                )
-              else
-                Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: availableProducts
-                        .map((p) => ListTile(
-                              title: Text(p.name),
-                              subtitle: Text('\$ ${p.unitPrice.toStringAsFixed(2)}'),
-                              onTap: () => Navigator.pop(ctx, p),
-                            ))
-                        .toList(),
-                  ),
-                ),
-            ],
-          ),
-        ),
+  void _selectCategory(Category category, BuildContext context) {
+    _animCtrl.reverse();
+    setState(() => _categoryExpanded = false);
+    context.read<SupermarketFormBloc>().add(SupermarketFormCategorySelected(category));
+  }
+
+  Future<void> _pickProduct(BuildContext context, List<Product> availableProducts) async {
+    final picked = await Navigator.push<Product>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SelectProductPage(initialProducts: availableProducts),
       ),
     );
 
@@ -171,6 +122,9 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return BlocConsumer<SupermarketFormBloc, SupermarketFormState>(
       listener: (context, state) {
         if (state is SupermarketFormSuccess) {
@@ -188,12 +142,11 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView> {
         List<CartItem> cart = [];
         List<Product> availableProducts = [];
         List<Category> categories = [];
-
         double baseCupo = 0.0;
 
         if (state is SupermarketFormLoaded) {
           total = state.cart.fold(0.0, (sum, item) => sum + item.subtotal);
-          categoryName = state.selectedCategory?.name ?? 'Seleccionar';
+          categoryName = state.selectedCategory?.name ?? 'Seleccionar categoría';
           cart = state.cart;
           availableProducts = state.availableProducts;
           categories = state.categories;
@@ -201,7 +154,7 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView> {
         }
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF5F6FA),
+          backgroundColor: cs.surface,
           body: SafeArea(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -212,82 +165,96 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView> {
                   label: 'Cupo restante',
                   prefixSign: '\$',
                   amountText: (baseCupo - total).toStringAsFixed(2),
-                  amountColor: (baseCupo - total) < 0 ? const Color(0xFFE53935) : const Color(0xFF1A1A2E),
+                  amountColor: (baseCupo - total) < 0 ? cs.error : cs.onSurface,
                 ),
                 const SizedBox(height: 8),
                 Center(
                   child: Text(
                     'Total carrito: \$${total.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      color: Colors.grey,
+                    style: tt.bodyMedium?.copyWith(
+                      color: cs.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
-                      fontSize: 14,
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                FormFieldRow(
+
+                _FieldCard(
                   icon: Icons.shopping_cart_outlined,
-                  iconBackgroundColor: const Color(0xFFFCEDD3),
-                  iconColor: const Color(0xFFC8923B),
                   label: 'Categoría',
                   value: categoryName,
-                  onTap: isLoading ? () {} : () => _pickCategory(context, categories),
+                  isExpanded: _categoryExpanded,
+                  isLoading: isLoading,
+                  onTap: isLoading ? null : () => _toggleCategory(categories),
+                ),
+                SizeTransition(
+                  sizeFactor: _expandAnim,
+                  alignment: Alignment.topCenter,
+                  child: _CategoryList(
+                    categories: categories,
+                    selectedId: state is SupermarketFormLoaded
+                        ? state.selectedCategory?.id
+                        : null,
+                    onSelect: (c) => _selectCategory(c, context),
+                  ),
                 ),
                 const SizedBox(height: 12),
-                FormFieldRow(
-                  icon: Icons.calendar_today_outlined,
-                  iconBackgroundColor: const Color(0xFFDCE6FB),
-                  iconColor: const Color(0xFF2962FF),
-                  label: 'Fecha',
-                  value: 'Hoy',
-                  onTap: () {},
-                ),
-                const SizedBox(height: 12),
+
                 InlineEditableFieldRow(
                   icon: Icons.description_outlined,
-                  iconBackgroundColor: const Color(0xFFD7F2EC),
-                  iconColor: const Color(0xFF1FAE8E),
                   label: 'Descripción',
                   controller: _descController,
                   hintText: 'Compra Supermaxi',
                   enabled: !isLoading,
                 ),
                 const SizedBox(height: 24),
+
                 SectionHeaderWithAction(
                   title: 'Productos',
                   actionLabel: '+ Agregar',
                   onActionTap: isLoading ? () {} : () => _pickProduct(context, availableProducts),
                 ),
                 const SizedBox(height: 12),
-                for (int i = 0; i < cart.length; i++) ...[
-                  CartProductRow(
-                    item: cart[i],
-                    onIncrement: isLoading
-                        ? () {}
-                        : () => context.read<SupermarketFormBloc>().add(
-                              SupermarketFormProductUpdated(i, cart[i].quantity + 1),
-                            ),
-                    onDecrement: isLoading
-                        ? () {}
-                        : () {
-                            if (cart[i].quantity > 1) {
-                              context.read<SupermarketFormBloc>().add(
-                                SupermarketFormProductUpdated(i, cart[i].quantity - 1),
-                              );
-                            } else {
-                              context.read<SupermarketFormBloc>().add(
-                                SupermarketFormProductRemoved(i),
-                              );
-                            }
-                          },
-                  ),
-                  if (i != cart.length - 1) const SizedBox(height: 10),
-                ],
+
+                if (cart.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Center(
+                      child: Text(
+                        'Presiona "+ Agregar" para añadir productos',
+                        style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                      ),
+                    ),
+                  )
+                else
+                  for (int i = 0; i < cart.length; i++) ...[
+                    CartProductRow(
+                      item: cart[i],
+                      onIncrement: isLoading
+                          ? () {}
+                          : () => context.read<SupermarketFormBloc>().add(
+                                SupermarketFormProductUpdated(i, cart[i].quantity + 1),
+                              ),
+                      onDecrement: isLoading
+                          ? () {}
+                          : () {
+                              if (cart[i].quantity > 1) {
+                                context.read<SupermarketFormBloc>().add(
+                                  SupermarketFormProductUpdated(i, cart[i].quantity - 1),
+                                );
+                              } else {
+                                context.read<SupermarketFormBloc>().add(
+                                  SupermarketFormProductRemoved(i),
+                                );
+                              }
+                            },
+                    ),
+                    if (i != cart.length - 1) const SizedBox(height: 10),
+                  ],
                 const SizedBox(height: 32),
                 PrimaryActionButton(
                   label: state is SupermarketFormSubmitting ? 'Guardando...' : 'Guardar',
-                  color: const Color(0xFF2962FF),
+                  color: cs.primary,
                   onPressed: isLoading ? null : () => _submit(context),
                 ),
               ],
@@ -295,6 +262,171 @@ class _SupermarketExpenseViewState extends State<_SupermarketExpenseView> {
           ),
         );
       },
+    );
+  }
+}
+
+class _FieldCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final bool isExpanded;
+  final bool isLoading;
+  final VoidCallback? onTap;
+
+  const _FieldCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.isExpanded = false,
+    this.isLoading = false,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    return Material(
+      color: cs.surface,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: cs.outlineVariant, width: 1),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: cs.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Icon(icon, size: 20, color: cs.onPrimaryContainer),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label.toUpperCase(),
+                      style: tt.labelSmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      style: tt.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              AnimatedRotation(
+                turns: isExpanded ? 0.5 : 0,
+                duration: const Duration(milliseconds: 250),
+                child: Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 22,
+                  color: cs.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryList extends StatelessWidget {
+  final List<Category> categories;
+  final String? selectedId;
+  final ValueChanged<Category> onSelect;
+
+  const _CategoryList({
+    required this.categories,
+    this.selectedId,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    return Container(
+      margin: const EdgeInsets.only(top: 4),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (int i = 0; i < categories.length; i++) ...[
+            InkWell(
+              borderRadius: i == 0
+                  ? const BorderRadius.vertical(top: Radius.circular(17))
+                  : i == categories.length - 1
+                      ? const BorderRadius.vertical(bottom: Radius.circular(17))
+                      : null,
+              onTap: () => onSelect(categories[i]),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: cs.secondaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.category_outlined,
+                        size: 18,
+                        color: cs.onSecondaryContainer,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        categories[i].name,
+                        style: tt.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: cs.onSurface,
+                        ),
+                      ),
+                    ),
+                    if (categories[i].id == selectedId)
+                      Icon(Icons.check, size: 20, color: cs.primary),
+                  ],
+                ),
+              ),
+            ),
+            if (i != categories.length - 1)
+              Divider(height: 1, indent: 64, color: cs.outlineVariant),
+          ],
+        ],
+      ),
     );
   }
 }

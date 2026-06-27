@@ -21,15 +21,6 @@ class ProfileUpdateRequested extends ProfileEvent {
   List<Object?> get props => [firstName, lastName];
 }
 
-class ProfileDeactivateRequested extends ProfileEvent {
-  final String confirmation;
-
-  const ProfileDeactivateRequested({required this.confirmation});
-
-  @override
-  List<Object?> get props => [confirmation];
-}
-
 class ProfileImageUploadRequested extends ProfileEvent {
   final String filePath;
 

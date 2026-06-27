@@ -7,12 +7,13 @@ class BottomSheetDragHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Container(
         width: 48,
         height: 4,
         decoration: BoxDecoration(
-          color: const Color(0xFFDCDEE6),
+          color: cs.onSurfaceVariant.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(2),
         ),
       ),

@@ -22,6 +22,7 @@ class IncomeExpenseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return ReportCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -29,19 +30,19 @@ class IncomeExpenseCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Ingresos vs Gastos',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A2E),
+                  color: cs.onSurface,
                 ),
               ),
               Text(
                 periodLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: Color(0xFF9A9DB0),
+                  color: cs.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -52,6 +53,7 @@ class IncomeExpenseCard extends StatelessWidget {
             data: data,
             incomeColor: incomeColor,
             expenseColor: expenseColor,
+            labelColor: cs.onSurfaceVariant,
           ),
           const SizedBox(height: 12),
           Row(

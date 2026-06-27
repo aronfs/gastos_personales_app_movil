@@ -70,9 +70,9 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
           _hasSaved = true;
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Categoría creada correctamente.'),
-              backgroundColor: Color(0xFF43A047),
+            SnackBar(
+              content: const Text('Categoría creada correctamente.'),
+              backgroundColor: cs.tertiary,
             ),
           );
           Navigator.pop(context, true);
@@ -82,7 +82,7 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: cs.error,
             ),
           );
           if (state.message.contains('Sesión expirada') && mounted) {
@@ -108,9 +108,9 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Nombre',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                   validator: (v) =>
                       (v == null || v.trim().isEmpty) ? 'El nombre es obligatorio' : null,
@@ -180,9 +180,9 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
                 const SizedBox(height: 24),
                 DropdownButtonFormField<CategoryType>(
                   initialValue: _selectedType,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Tipo',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: cs.outline)),
                   ),
                   items: const [
                     DropdownMenuItem(
@@ -204,12 +204,12 @@ class _CategoryCreatePageState extends State<CategoryCreatePage> {
                 FilledButton(
                   onPressed: _isSaving ? null : _onSave,
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: cs.surfaceContainerLowest,
                           ),
                         )
                       : const Text('Crear categoría'),

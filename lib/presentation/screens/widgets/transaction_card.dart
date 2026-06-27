@@ -18,8 +18,9 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Material(
-      color: Colors.white,
+      color: cs.surfaceContainerLowest,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -29,7 +30,7 @@ class TransactionCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFEEF0F4), width: 1),
+            border: Border.all(color: cs.outlineVariant, width: 1),
           ),
           child: Row(
             children: [
@@ -55,18 +56,22 @@ class TransactionCard extends StatelessWidget {
                   children: [
                     Text(
                       entry.title,
-                      style: const TextStyle(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A2E),
+                        color: cs.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       entry.subtitle,
-                      style: const TextStyle(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
                         fontSize: 12.5,
-                        color: Color(0xFF9A9DB0),
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -77,9 +82,7 @@ class TransactionCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: entry.isPositive
-                      ? const Color(0xFF2E9E4F)
-                      : const Color(0xFF1A1A2E),
+                  color: entry.isPositive ? cs.tertiary : cs.onSurface,
                 ),
               ),
             ],

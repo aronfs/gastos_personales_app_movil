@@ -44,10 +44,11 @@ class _QuickActionsBottomSheetState extends State<QuickActionsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFF5F6FA),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLow,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
@@ -61,9 +62,9 @@ class _QuickActionsBottomSheetState extends State<QuickActionsBottomSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFEEF0F4), width: 1),
+              border: Border.all(color: cs.outlineVariant, width: 1),
             ),
             child: ShortcutsTabBar(
               tabs: _tabs,
@@ -75,7 +76,7 @@ class _QuickActionsBottomSheetState extends State<QuickActionsBottomSheet> {
 
           // Botón Cancelar
           Material(
-            color: Colors.white,
+            color: cs.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(18),
             child: InkWell(
               borderRadius: BorderRadius.circular(18),
@@ -86,14 +87,14 @@ class _QuickActionsBottomSheetState extends State<QuickActionsBottomSheet> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFFEEF0F4), width: 1),
+                  border: Border.all(color: cs.outlineVariant, width: 1),
                 ),
-                child: const Text(
+                child: Text(
                   'Cancelar',
                   style: TextStyle(
                     fontSize: 15.5,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A2E),
+                    color: cs.onSurface,
                   ),
                 ),
               ),

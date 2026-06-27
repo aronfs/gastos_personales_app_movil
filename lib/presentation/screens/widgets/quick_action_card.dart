@@ -11,8 +11,9 @@ class QuickActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Material(
-      color: Colors.white,
+      color: cs.surfaceContainerLowest,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
@@ -21,7 +22,7 @@ class QuickActionCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFEEF0F4), width: 1),
+            border: Border.all(color: cs.outlineVariant, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,10 +46,10 @@ class QuickActionCard extends StatelessWidget {
               // Título
               Text(
                 action.title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A2E),
+                  color: cs.onSurface,
                   height: 1.2,
                 ),
               ),
@@ -56,9 +57,9 @@ class QuickActionCard extends StatelessWidget {
               // Subtítulo
               Text(
                 action.subtitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12.5,
-                  color: Color(0xFF9A9DB0),
+                  color: cs.onSurfaceVariant,
                   height: 1.35,
                 ),
               ),

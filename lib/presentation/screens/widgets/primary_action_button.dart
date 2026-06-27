@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class PrimaryActionButton extends StatelessWidget {
   final String label;
-  final Color color;
+  final Color? color;
   final VoidCallback? onPressed;
 
   const PrimaryActionButton({
     super.key,
     required this.label,
-    this.color = const Color(0xFF2563EB),
+    this.color,
     this.onPressed,
   });
 
@@ -16,7 +16,7 @@ class PrimaryActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final bgColor = color == const Color(0xFF2563EB) ? cs.primary : color;
+    final bgColor = color ?? cs.primary;
 
     return Material(
       color: bgColor,

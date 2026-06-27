@@ -28,10 +28,11 @@ class PeriodSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFEDEFF3),
+        color: cs.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
@@ -45,12 +46,12 @@ class PeriodSelector extends StatelessWidget {
                 curve: Curves.easeOut,
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white : Colors.transparent,
+                  color: isSelected ? cs.surfaceContainerLowest : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
+                            color: cs.shadow.withValues(alpha: 0.08),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -63,9 +64,7 @@ class PeriodSelector extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected
-                        ? const Color(0xFF1A1A2E)
-                        : const Color(0xFF8C8FA3),
+                    color: isSelected ? cs.onSurface : cs.onSurfaceVariant,
                   ),
                 ),
               ),

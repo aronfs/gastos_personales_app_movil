@@ -38,16 +38,25 @@ class ProfileBar extends StatelessWidget {
               : null,
         ),
         const SizedBox(width: 10),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              gretting,
-              style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
-            ),
-            Text(name, style: tt.headlineMedium?.copyWith(color: cs.onSurface)),
-          ],
+        Flexible(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                gretting,
+                style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
+              ),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  name,
+                  style: tt.headlineMedium?.copyWith(color: cs.onSurface),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

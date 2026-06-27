@@ -20,6 +20,7 @@ class CategoryDonutChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return SizedBox(
       width: size,
       height: size,
@@ -36,10 +37,10 @@ class CategoryDonutChart extends StatelessWidget {
           Text(
             centerLabel,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1A2E),
+              color: cs.onSurface,
             ),
           ),
         ],

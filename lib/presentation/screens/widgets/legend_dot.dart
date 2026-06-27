@@ -17,6 +17,7 @@ class LegendDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -29,9 +30,9 @@ class LegendDot extends StatelessWidget {
         Text(
           label,
           style: textStyle ??
-              const TextStyle(
+              TextStyle(
                 fontSize: 13,
-                color: Color(0xFF6B6E80),
+                color: cs.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
         ),

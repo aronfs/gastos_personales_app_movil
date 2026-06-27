@@ -20,6 +20,7 @@ class ActiveSessionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -33,18 +34,18 @@ class ActiveSessionRow extends StatelessWidget {
               children: [
                 Text(
                   deviceName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1A2E),
+                    color: cs.onSurface,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   locationInfo,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
-                    color: Color(0xFF9A9DB0),
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ],

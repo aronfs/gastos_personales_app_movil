@@ -64,7 +64,7 @@ class _CategoriesView extends StatelessWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text('Eliminar', style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
           ),
         ],
       ),
@@ -78,15 +78,16 @@ class _CategoriesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
         child: BlocConsumer<CategoriesBloc, CategoriesState>(
           listener: (context, state) {
             if (state is CategoriesUpdateSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Categoría actualizada correctamente.'),
-                  backgroundColor: Color(0xFF43A047),
+                SnackBar(
+                  content: const Text('Categoría actualizada correctamente.'),
+                  backgroundColor: cs.tertiary,
                 ),
               );
               context.read<CategoriesBloc>().add(
@@ -96,7 +97,7 @@ class _CategoriesView extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: Colors.red,
+                  backgroundColor: cs.error,
                 ),
               );
               if (state.message.contains('Sesión expirada')) {

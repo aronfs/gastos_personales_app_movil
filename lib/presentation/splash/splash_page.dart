@@ -42,12 +42,12 @@ class _SplashPageState extends State<SplashPage> {
               ),
               Text(
                 appLocalizations.titleSplash,
-                style: textStyleWhite.display32,
+                style: textStyleWhite(cs).display32,
               ),
               const SizedBox(height: 16),
               Text(
                 appLocalizations.descriptionSplash,
-                style: textStyleWhite.body14,
+                style: textStyleWhite(cs).body14,
                 textAlign: TextAlign.center,
               ),
             ],

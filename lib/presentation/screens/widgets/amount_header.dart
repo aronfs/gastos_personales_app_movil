@@ -7,18 +7,20 @@ class AmountHeader extends StatelessWidget {
   final String label;
   final String amountText;
   final String? prefixSign;
-  final Color amountColor;
+  final Color? amountColor;
 
   const AmountHeader({
     super.key,
     required this.label,
     required this.amountText,
     this.prefixSign,
-    this.amountColor = const Color(0xFF1A1A2E),
+    this.amountColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final resolvedAmountColor = amountColor ?? cs.onSurface;
     return Column(
       children: [
         Text(
@@ -26,7 +28,7 @@ class AmountHeader extends StatelessWidget {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: amountColor.withValues(alpha: 0.7),
+            color: resolvedAmountColor.withValues(alpha: 0.7),
             letterSpacing: 0.5,
           ),
         ),
@@ -44,7 +46,7 @@ class AmountHeader extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
-                    color: amountColor,
+                    color: resolvedAmountColor,
                   ),
                 ),
               ),
@@ -53,7 +55,7 @@ class AmountHeader extends StatelessWidget {
               style: TextStyle(
                 fontSize: 44,
                 fontWeight: FontWeight.w800,
-                color: amountColor,
+                color: resolvedAmountColor,
               ),
             ),
           ],

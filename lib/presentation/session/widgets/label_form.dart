@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:gastos_personales/ui.theme/styles/text_style_app.dart';
 
 class LabelForm extends StatelessWidget {
@@ -7,6 +7,7 @@ class LabelForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(label, style: textStyleGrey.h124);
+    final cs = Theme.of(context).colorScheme;
+    return Text(label, style: textStyleGrey(cs).h124);
   }
 }

@@ -18,12 +18,13 @@ class CartProductRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cs.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFEEF0F4), width: 1),
+        border: Border.all(color: cs.outlineVariant, width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -33,14 +34,14 @@ class CartProductRow extends StatelessWidget {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F3F7),
+              color: cs.surfaceContainerLow,
               borderRadius: BorderRadius.circular(10),
             ),
             alignment: Alignment.center,
-            child: const Icon(
+            child: Icon(
               Icons.inventory_2_outlined,
               size: 18,
-              color: Color(0xFF4A4D5E),
+              color: cs.onSurfaceVariant,
             ),
           ),
           const SizedBox(width: 12),
@@ -52,18 +53,18 @@ class CartProductRow extends StatelessWidget {
               children: [
                 Text(
                   item.product.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1A2E),
+                    color: cs.onSurface,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '\$ ${item.product.unitPrice.toStringAsFixed(2)} c/u',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF9A9DB0),
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -82,10 +83,10 @@ class CartProductRow extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Text(
                   '${item.quantity}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1A2E),
+                    color: cs.onSurface,
                   ),
                 ),
               ),
@@ -100,10 +101,10 @@ class CartProductRow extends StatelessWidget {
           // Subtotal
           Text(
             '\$ ${item.subtotal.toStringAsFixed(2)}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1A1A2E),
+              color: cs.onSurface,
             ),
           ),
         ],
@@ -125,8 +126,9 @@ class _CounterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Material(
-      color: isActive ? const Color(0xFF2962FF) : const Color(0xFFEDEEF3),
+      color: isActive ? cs.primary : cs.surfaceContainerHigh,
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -137,7 +139,7 @@ class _CounterButton extends StatelessWidget {
           child: Icon(
             icon,
             size: 14,
-            color: isActive ? Colors.white : const Color(0xFF4A4D5E),
+            color: isActive ? Colors.white : cs.onSurfaceVariant,
           ),
         ),
       ),

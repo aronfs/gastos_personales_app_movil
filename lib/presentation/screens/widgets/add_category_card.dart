@@ -15,6 +15,7 @@ class AddCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -23,7 +24,7 @@ class AddCategoryCard extends StatelessWidget {
         onTap: onTap,
         child: CustomPaint(
           painter: _DashedRectPainter(
-            color: const Color(0xFFCBCED9),
+            color: cs.onSurfaceVariant,
             radius: 20,
           ),
           child: Container(
@@ -33,24 +34,24 @@ class AddCategoryCard extends StatelessWidget {
                 Container(
                   width: 48,
                   height: 48,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF2F3F7),
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerLow,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: const Icon(
+                  child: Icon(
                     Icons.add,
                     size: 22,
-                    color: Color(0xFF9A9DB0),
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 10),
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF9A9DB0),
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ],

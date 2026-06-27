@@ -52,7 +52,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   void _showError(String msg) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+      ..showSnackBar(SnackBar(content: Text(msg), backgroundColor: Theme.of(context).colorScheme.error));
   }
 
   @override

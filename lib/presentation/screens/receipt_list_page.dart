@@ -93,7 +93,7 @@ class _ReceiptListViewState extends State<_ReceiptListView> {
                               Navigator.pop(ctx);
                               context.read<ReceiptScannerBloc>().add(ReceiptClearAllRequested());
                             },
-                            child: const Text('Limpiar', style: TextStyle(color: Colors.red)),
+                            child: Text('Limpiar', style: TextStyle(color: Theme.of(ctx).colorScheme.error)),
                           ),
                         ],
                       ),
@@ -245,10 +245,10 @@ class _ReceiptListItem extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     final statusColor = switch (receipt.status) {
-      ReceiptStatus.completed => const Color(0xFF43A047),
+      ReceiptStatus.completed => cs.tertiary,
       ReceiptStatus.needsReview => Colors.orange,
-      ReceiptStatus.processing => Colors.blue,
-      ReceiptStatus.error => Colors.red,
+      ReceiptStatus.processing => cs.primary,
+      ReceiptStatus.error => cs.error,
     };
 
     final statusLabel = switch (receipt.status) {

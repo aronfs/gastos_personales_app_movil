@@ -10,6 +10,7 @@ class CategoryLegendRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -26,19 +27,19 @@ class CategoryLegendRow extends StatelessWidget {
           Expanded(
             child: Text(
               category.name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: Color(0xFF4A4D5E),
+                color: cs.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
           Text(
             '${category.percentage.toStringAsFixed(0)}%',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1A1A2E),
+              color: cs.onSurface,
             ),
           ),
         ],

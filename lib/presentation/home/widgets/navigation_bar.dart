@@ -17,14 +17,15 @@ class NavigationBarCustom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return BottomNavigationBar(
       currentIndex: selectedIndex,
       onTap: onItemTapped,
       type: BottomNavigationBarType.fixed,
       showSelectedLabels: true,
       showUnselectedLabels: true,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: cs.primary,
+      unselectedItemColor: cs.onSurfaceVariant,
       selectedLabelStyle: const TextStyle(fontSize: 10),
       unselectedLabelStyle: const TextStyle(fontSize: 10),
       items: menus.map((menu) {

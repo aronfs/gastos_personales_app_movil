@@ -188,23 +188,24 @@ class _NewProductPageState extends State<NewProductPage> {
           }
         },
         builder: (context, state) {
+          final cs = Theme.of(context).colorScheme;
           final loading = state is ProductFormLoading;
           final categoryName = _loadingCategories
               ? 'Cargando...'
               : (_selectedCategory?.name ?? 'Seleccionar');
 
           return Scaffold(
-            backgroundColor: const Color(0xFFF5F6FA),
+            backgroundColor: cs.surface,
             body: SafeArea(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
                   const SettingsAppBar(title: 'Nuevo producto'),
                   const SizedBox(height: 24),
-                  const Center(
+                  Center(
                     child: IconCircleAvatar(
                       icon: Icons.inventory_2_outlined,
-                      backgroundColor: Color(0xFF2962FF),
+                      backgroundColor: cs.primary,
                       caption: 'Producto del catálogo',
                     ),
                   ),
@@ -214,7 +215,7 @@ class _NewProductPageState extends State<NewProductPage> {
                     controller: _nameController,
                     hintText: 'Ej. Arroz',
                     prefixIcon: Icons.sell_outlined,
-                    prefixIconColor: const Color(0xFF9A9DB0),
+                    prefixIconColor: cs.onSurfaceVariant,
                   ),
                   const SizedBox(height: 16),
                   LabeledTextField(
@@ -222,7 +223,7 @@ class _NewProductPageState extends State<NewProductPage> {
                     controller: _descController,
                     hintText: 'Ej. Arroz integral 1kg',
                     prefixIcon: Icons.description_outlined,
-                    prefixIconColor: const Color(0xFF9A9DB0),
+                    prefixIconColor: cs.onSurfaceVariant,
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -232,28 +233,28 @@ class _NewProductPageState extends State<NewProductPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'PRECIO UNITARIO',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF9A9DB0),
+                                color: cs.onSurfaceVariant,
                                 letterSpacing: 0.4,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Material(
-                              color: Colors.white,
+                              color: cs.surfaceContainerLowest,
                               borderRadius: BorderRadius.circular(14),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(color: const Color(0xFFEEF0F4), width: 1),
+                                  border: Border.all(color: cs.outlineVariant, width: 1),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.attach_money, size: 16, color: Color(0xFF2E9E4F)),
+                                    Icon(Icons.attach_money, size: 16, color: cs.tertiary),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: TextField(
@@ -262,13 +263,14 @@ class _NewProductPageState extends State<NewProductPage> {
                                         inputFormatters: [
                                           FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                                         ],
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF1A1A2E),
+                                          color: cs.onSurface,
                                         ),
-                                        decoration: const InputDecoration(
+                                        decoration: InputDecoration(
                                           hintText: '0.00',
+                                          hintStyle: TextStyle(color: cs.onSurfaceVariant),
                                           border: InputBorder.none,
                                           isDense: true,
                                           contentPadding: EdgeInsets.symmetric(vertical: 10),
@@ -287,19 +289,19 @@ class _NewProductPageState extends State<NewProductPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'CATEGORÍA',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF9A9DB0),
+                                color: cs.onSurfaceVariant,
                                 letterSpacing: 0.4,
                               ),
                             ),
                             const SizedBox(height: 8),
                             InlineInputField(
                               icon: Icons.shopping_cart_outlined,
-                              iconColor: const Color(0xFFC8923B),
+                              iconColor: cs.onSurfaceVariant,
                               value: categoryName,
                               onTap: loading ? null : _pickCategory,
                             ),
@@ -317,7 +319,6 @@ class _NewProductPageState extends State<NewProductPage> {
                   const SizedBox(height: 24),
                   PrimaryActionButton(
                     label: loading ? 'Creando...' : 'Crear producto',
-                    color: const Color(0xFF2962FF),
                     onPressed: loading ? null : () => _submit(context),
                   ),
                 ],

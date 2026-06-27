@@ -6,8 +6,8 @@ class InlineCalendarPicker extends StatefulWidget {
   final String label;
   final DateTime selectedDate;
   final IconData icon;
-  final Color iconBackgroundColor;
-  final Color iconColor;
+  final Color? iconBackgroundColor;
+  final Color? iconColor;
   final ValueChanged<DateTime> onDateChanged;
   final DateTime? firstDate;
   final DateTime? lastDate;
@@ -19,8 +19,8 @@ class InlineCalendarPicker extends StatefulWidget {
     required this.selectedDate,
     required this.onDateChanged,
     this.icon = Icons.calendar_today_outlined,
-    this.iconBackgroundColor = const Color(0xFFF2F3F7),
-    this.iconColor = const Color(0xFF2A2D3A),
+    this.iconBackgroundColor,
+    this.iconColor,
     this.firstDate,
     this.lastDate,
     this.enabled = true,
@@ -122,11 +122,11 @@ class _InlineCalendarPickerState extends State<InlineCalendarPicker> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: widget.iconBackgroundColor,
+                    color: widget.iconBackgroundColor ?? cs.surfaceContainerLow,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: Icon(widget.icon, size: 16, color: widget.iconColor),
+                  child: Icon(widget.icon, size: 16, color: widget.iconColor ?? cs.onSurfaceVariant),
                 ),
                 const SizedBox(width: 10),
                 Text(

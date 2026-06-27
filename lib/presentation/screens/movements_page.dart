@@ -89,23 +89,7 @@ class _MovementsViewState extends State<_MovementsView> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: cs.surfaceContainerLowest,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: cs.shadow.withValues(alpha: 0.05),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Icon(Icons.tune_outlined, color: cs.onSurface),
-                      ),
+
                     ],
                   ),
                 ),
@@ -321,23 +305,34 @@ class _MovementCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(movement.description, style: tt.titleMedium),
+                Text(
+                  movement.description,
+                  style: tt.titleMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Text(
-                      movement.category.name,
-                      style: tt.labelSmall?.copyWith(
-                        color: cs.onSurfaceVariant,
+                    Flexible(
+                      child: Text(
+                        movement.category.name,
+                        style: tt.labelSmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '· ${movement.transactionDate}',
-                      style: tt.labelSmall?.copyWith(
-                        color: cs.onSurfaceVariant,
+                    if (movement.transactionDate.isNotEmpty) ...[
+                      const SizedBox(width: 6),
+                      Text(
+                        '· ${movement.transactionDate}',
+                        style: tt.labelSmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ],
@@ -351,6 +346,8 @@ class _MovementCard extends StatelessWidget {
               color: amountColor,
               fontWeight: FontWeight.w700,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

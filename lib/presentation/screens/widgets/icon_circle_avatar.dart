@@ -5,22 +5,23 @@ import 'package:flutter/material.dart';
 /// (ej. "Nuevo producto").
 class IconCircleAvatar extends StatelessWidget {
   final IconData icon;
-  final Color backgroundColor;
-  final Color iconColor;
+  final Color? backgroundColor;
+  final Color? iconColor;
   final double size;
   final String? caption;
 
   const IconCircleAvatar({
     super.key,
     required this.icon,
-    this.backgroundColor = const Color(0xFF2962FF),
-    this.iconColor = Colors.white,
+    this.backgroundColor,
+    this.iconColor,
     this.size = 72,
     this.caption,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -28,20 +29,20 @@ class IconCircleAvatar extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: backgroundColor,
+            color: backgroundColor ?? cs.primary,
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
-          child: Icon(icon, size: size * 0.42, color: iconColor),
+          child: Icon(icon, size: size * 0.42, color: iconColor ?? cs.onPrimary),
         ),
         if (caption != null) ...[
           const SizedBox(height: 12),
           Text(
             caption!.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF9A9DB0),
+              color: cs.onSurfaceVariant,
               letterSpacing: 0.5,
             ),
           ),

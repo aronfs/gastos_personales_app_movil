@@ -3,7 +3,10 @@ import 'package:gastos_personales/util/env.dart';
 class ApiEndpoints {
   static final String baseUrl = Env.baseUrl;
 
+  
   static final String login = '$baseUrl/auth/login';
+  static final String register = '$baseUrl/auth/register';
+
   static final String dashboardSummary = '$baseUrl/dashboard';
   static final String movements = '$baseUrl/movements';
 

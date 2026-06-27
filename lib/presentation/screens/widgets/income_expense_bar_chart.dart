@@ -8,6 +8,7 @@ class IncomeExpenseBarChart extends StatelessWidget {
   final Color incomeColor;
   final Color expenseColor;
   final double height;
+  final Color labelColor;
 
   const IncomeExpenseBarChart({
     super.key,
@@ -15,6 +16,7 @@ class IncomeExpenseBarChart extends StatelessWidget {
     this.incomeColor = const Color(0xFF34C759),
     this.expenseColor = const Color(0xFF2F6BFF),
     this.height = 160,
+    this.labelColor = const Color(0xFF8C8FA3),
   });
 
   @override
@@ -22,10 +24,10 @@ class IncomeExpenseBarChart extends StatelessWidget {
     if (data.isEmpty) {
       return SizedBox(
         height: height,
-        child: const Center(
+        child: Center(
           child: Text(
             'Sin datos para este periodo',
-            style: TextStyle(color: Color(0xFF8C8FA3), fontSize: 13),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13),
           ),
         ),
       );
@@ -39,6 +41,7 @@ class IncomeExpenseBarChart extends StatelessWidget {
           data: data,
           incomeColor: incomeColor,
           expenseColor: expenseColor,
+          labelColor: labelColor,
         ),
       ),
     );
@@ -49,11 +52,13 @@ class _BarChartPainter extends CustomPainter {
   final List<IncomeExpensePoint> data;
   final Color incomeColor;
   final Color expenseColor;
+  final Color labelColor;
 
   _BarChartPainter({
     required this.data,
     required this.incomeColor,
     required this.expenseColor,
+    this.labelColor = const Color(0xFF8C8FA3),
   });
 
   @override
@@ -111,7 +116,7 @@ class _BarChartPainter extends CustomPainter {
 
       textPainter.text = TextSpan(
         text: point.label,
-        style: const TextStyle(color: Color(0xFF8C8FA3), fontSize: 11),
+        style: TextStyle(color: labelColor, fontSize: 11),
       );
       textPainter.layout();
       textPainter.paint(
