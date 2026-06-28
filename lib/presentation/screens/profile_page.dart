@@ -14,14 +14,20 @@ import 'package:gastos_personales/layers/profile/domain/usecase/update_profile.d
 import 'package:gastos_personales/layers/profile/domain/usecase/upload_profile_image.dart';
 import 'package:gastos_personales/main.dart' show themeNotifier;
 import 'package:gastos_personales/presentation/providers/profile_provider.dart';
+import 'package:gastos_personales/presentation/screens/edit_profile_page.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_bloc.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_event.dart';
 import 'package:gastos_personales/presentation/screens/bloc/profile/profile_state.dart';
 import 'package:gastos_personales/util/session_manager.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final repo = ProfileRepositoryImpl(ProfileApiImpl());
@@ -57,17 +63,14 @@ class _ProfileViewState extends State<_ProfileView>
   late final List<Animation<double>> _itemAnimations;
   final _scrollController = ScrollController();
   final _picker = ImagePicker();
-  final _editSectionKey = GlobalKey();
 
-  bool _isEditing = false;
+  bool _isEditPageOpen = false;
   bool _showDeleteConfirm = false;
   bool _showLogoutConfirm = false;
   bool _showImageOptions = false;
+  bool _noticeIsError = false;
+  String? _noticeMessage;
 
-  late final TextEditingController _firstNameCtrl;
-  late final TextEditingController _lastNameCtrl;
-  final _formKey = GlobalKey<FormState>();
-  bool _hasChanges = false;
   File? _selectedFile;
 
   static const _itemCount = 6;
@@ -88,91 +91,53 @@ class _ProfileViewState extends State<_ProfileView>
       );
     });
     _staggerController.forward();
-
-    _firstNameCtrl = TextEditingController();
-    _lastNameCtrl = TextEditingController();
   }
 
   @override
   void dispose() {
     _staggerController.dispose();
     _scrollController.dispose();
-    _firstNameCtrl.dispose();
-    _lastNameCtrl.dispose();
     super.dispose();
   }
 
-  void _initFormControllers(Profile profile) {
-    if (_firstNameCtrl.text.isEmpty && _lastNameCtrl.text.isEmpty) {
-      _firstNameCtrl.text = profile.firstName;
-      _lastNameCtrl.text = profile.lastName;
-      _firstNameCtrl.addListener(_onFieldChanged);
-      _lastNameCtrl.addListener(_onFieldChanged);
-    }
-  }
-
-  void _onFieldChanged() {
-    final firstName = _firstNameCtrl.text;
-    final lastName = _lastNameCtrl.text;
-    final profile = _currentProfile();
-    final changed =
-        profile != null &&
-        (firstName != profile.firstName || lastName != profile.lastName);
-    if (changed != _hasChanges) {
-      setState(() => _hasChanges = changed);
-    }
-  }
-
-  Profile? _currentProfile() {
-    final state = context.read<ProfileBloc>().state;
-    if (state is ProfileLoaded) return state.profile;
-    if (state is ProfileOperationLoading) return state.profile;
-    if (state is ProfileSuccess) return state.profile;
-    if (state is ProfileError) return state.profile;
-    return null;
-  }
-
-  void _handleSave() {
-    if (!_formKey.currentState!.validate()) return;
-    context.read<ProfileBloc>().add(
-      ProfileUpdateRequested(
-        firstName: _firstNameCtrl.text.trim(),
-        lastName: _lastNameCtrl.text.trim(),
-      ),
-    );
-  }
-
-  void _cancelEdit() {
+  Future<void> _openEditProfilePage(Profile profile) async {
     setState(() {
-      _isEditing = false;
-      _hasChanges = false;
-      final profile = _currentProfile();
-      if (profile != null) {
-        _firstNameCtrl.text = profile.firstName;
-        _lastNameCtrl.text = profile.lastName;
-      }
-    });
-  }
-
-  void _toggleEditSection() {
-    final shouldScrollToForm = !_isEditing;
-    setState(() {
-      _isEditing = !_isEditing;
+      _isEditPageOpen = true;
       _showDeleteConfirm = false;
       _showLogoutConfirm = false;
+      _showImageOptions = false;
+      _noticeMessage = null;
     });
 
-    if (!shouldScrollToForm) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final context = _editSectionKey.currentContext;
-      if (context == null) return;
-      Scrollable.ensureVisible(
-        context,
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOutCubic,
-        alignment: 0.1,
-      );
-    });
+    final updated = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) {
+          return BlocProvider.value(
+            value: context.read<ProfileBloc>(),
+            child: EditProfilePage(
+              currentFirstName: profile.firstName,
+              currentLastName: profile.lastName,
+            ),
+          );
+        },
+      ),
+    );
+
+    if (!mounted) return;
+    setState(() => _isEditPageOpen = false);
+
+    if (updated == true) {
+      context.read<ProfileBloc>().add(const ProfileFetchRequested());
+      await context.read<ProfileImageProvider>().loadImage();
+    }
+  }
+
+  void _setDarkMode(bool enabled) {
+    themeNotifier.value = enabled ? ThemeMode.dark : ThemeMode.light;
+  }
+
+  void _toggleDarkMode() {
+    _setDarkMode(themeNotifier.value != ThemeMode.dark);
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -181,6 +146,7 @@ class _ProfileViewState extends State<_ProfileView>
     setState(() {
       _selectedFile = File(picked.path);
       _showImageOptions = false;
+      _noticeMessage = null;
     });
     context.read<ProfileBloc>().add(
       ProfileImageUploadRequested(filePath: picked.path),
@@ -196,39 +162,20 @@ class _ProfileViewState extends State<_ProfileView>
 
     return BlocConsumer<ProfileBloc, ProfileState>(
       listener: (context, state) {
+        if (_isEditPageOpen) return;
+
         if (state is ProfileSuccess) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            );
-          if (_isEditing) {
-            setState(() {
-              _isEditing = false;
-              _hasChanges = false;
-            });
-          }
+          setState(() {
+            _noticeMessage = state.message;
+            _noticeIsError = false;
+          });
           context.read<ProfileBloc>().add(const ProfileFetchRequested());
           context.read<ProfileImageProvider>().loadImage();
-        } else if (state is ProfileError && state.profile == null) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: cs.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            );
+        } else if (state is ProfileError && state.profile != null) {
+          setState(() {
+            _noticeMessage = state.message;
+            _noticeIsError = true;
+          });
         }
       },
       builder: (context, state) {
@@ -262,10 +209,6 @@ class _ProfileViewState extends State<_ProfileView>
                   .toUpperCase()
             : '?';
 
-        if (!_isEditing) {
-          _initFormControllers(profile);
-        }
-
         return Scaffold(
           body: SafeArea(
             child: RefreshIndicator(
@@ -294,6 +237,15 @@ class _ProfileViewState extends State<_ProfileView>
                     ),
                   ),
                   const SizedBox(height: 20),
+                  if (_noticeMessage != null) ...[
+                    _ProfileNotice(
+                      message: _noticeMessage!,
+                      isError: _noticeIsError,
+                      cs: cs,
+                      onDismiss: () => setState(() => _noticeMessage = null),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
                   _buildAnimatedItem(
                     1,
                     _buildSectionHeader(context, loc.account, cs, tt),
@@ -304,36 +256,16 @@ class _ProfileViewState extends State<_ProfileView>
                     _GlassTile(
                       icon: Icons.edit_rounded,
                       label: loc.editProfile,
-                      onTap: _toggleEditSection,
-                      isActive: _isEditing,
-                      trailing: AnimatedRotation(
-                        turns: _isEditing ? 0.5 : 0,
-                        duration: const Duration(milliseconds: 220),
-                        curve: Curves.easeOutCubic,
-                        child: Icon(
-                          Icons.expand_more_rounded,
-                          size: 22,
-                          color: _isEditing
-                              ? cs.primary
-                              : cs.onSurfaceVariant.withValues(alpha: 0.5),
-                        ),
+                      onTap: isOperationLoading
+                          ? null
+                          : () => _openEditProfilePage(profile),
+                      trailing: Icon(
+                        Icons.chevron_right_rounded,
+                        color: cs.onSurfaceVariant,
                       ),
                       cs: cs,
                       isLight: isLight,
                     ),
-                  ),
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 300),
-                    crossFadeState: _isEditing
-                        ? CrossFadeState.showSecond
-                        : CrossFadeState.showFirst,
-                    firstChild: const SizedBox(width: double.infinity),
-                    secondChild: Padding(
-                      key: _editSectionKey,
-                      padding: const EdgeInsets.only(top: 8),
-                      child: _buildEditSection(cs, tt, loc, isLight),
-                    ),
-                    sizeCurve: Curves.easeOutCubic,
                   ),
                   const SizedBox(height: 16),
                   _buildAnimatedItem(
@@ -344,17 +276,13 @@ class _ProfileViewState extends State<_ProfileView>
                   _buildAnimatedItem(
                     4,
                     _GlassTile(
-                      icon: themeNotifier.value == ThemeMode.dark
-                          ? Icons.dark_mode_rounded
-                          : Icons.light_mode_rounded,
+                      icon: Icons.contrast_rounded,
                       label: loc.darkMode,
-                      trailing: _ThemeToggle(cs: cs),
-                      onTap: () {
-                        themeNotifier.value =
-                            themeNotifier.value == ThemeMode.dark
-                            ? ThemeMode.light
-                            : ThemeMode.dark;
-                      },
+                      trailing: _ThemeSwitch(
+                        value: themeNotifier.value == ThemeMode.dark,
+                        onChanged: _setDarkMode,
+                      ),
+                      onTap: _toggleDarkMode,
                       cs: cs,
                       isLight: isLight,
                     ),
@@ -715,156 +643,6 @@ class _ProfileViewState extends State<_ProfileView>
 
   bool _isLight(ColorScheme cs) => cs.brightness == Brightness.light;
 
-  Widget _buildEditSection(
-    ColorScheme cs,
-    TextTheme tt,
-    AppLocalizations loc,
-    bool isLight,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: isLight
-            ? Colors.white.withValues(alpha: 0.55)
-            : Colors.white.withValues(alpha: 0.06),
-        border: Border.all(
-          color: isLight
-              ? cs.primary.withValues(alpha: 0.3)
-              : cs.primary.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.person_rounded,
-                  size: 20,
-                  color: cs.onSurfaceVariant,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  loc.personalInfo,
-                  style: tt.labelLarge?.copyWith(
-                    color: cs.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _buildField(
-              label: loc.firstName,
-              controller: _firstNameCtrl,
-              icon: Icons.person_outline_rounded,
-              cs: cs,
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) return loc.firstnameRequired;
-                if (v.trim().length < 2) return loc.firstnameMin;
-                if (v.trim().length > 100) return loc.firstnameMax;
-                return null;
-              },
-            ),
-            const SizedBox(height: 14),
-            _buildField(
-              label: loc.lastName,
-              controller: _lastNameCtrl,
-              icon: Icons.person_outline_rounded,
-              cs: cs,
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) return loc.lastnameRequired;
-                if (v.trim().length < 2) return loc.lastnameMin;
-                if (v.trim().length > 100) return loc.lastnameMax;
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 48,
-                    child: FilledButton(
-                      onPressed: _hasChanges ? _handleSave : null,
-                      style: FilledButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Text(loc.saveChangesButton),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                SizedBox(
-                  height: 48,
-                  child: OutlinedButton(
-                    onPressed: _cancelEdit,
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: Text(loc.cancel),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildField({
-    required String label,
-    required TextEditingController controller,
-    required IconData icon,
-    required ColorScheme cs,
-    required String? Function(String?)? validator,
-  }) {
-    return Focus(
-      child: Builder(
-        builder: (context) {
-          final hasFocus = Focus.of(context).hasFocus;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: hasFocus ? cs.primary : cs.outlineVariant,
-                width: hasFocus ? 1.5 : 1,
-              ),
-            ),
-            child: TextFormField(
-              controller: controller,
-              validator: validator,
-              decoration: InputDecoration(
-                labelText: label,
-                prefixIcon: Icon(icon, size: 20),
-                filled: true,
-                fillColor: cs.surface,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   Widget _buildSectionHeader(
     BuildContext context,
     String title,
@@ -1063,6 +841,65 @@ class _ProfileViewState extends State<_ProfileView>
   }
 }
 
+class _ProfileNotice extends StatelessWidget {
+  final String message;
+  final bool isError;
+  final ColorScheme cs;
+  final VoidCallback onDismiss;
+
+  const _ProfileNotice({
+    required this.message,
+    required this.isError,
+    required this.cs,
+    required this.onDismiss,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isError ? cs.error : cs.primary;
+    final containerColor = isError ? cs.errorContainer : cs.primaryContainer;
+    final onContainerColor = isError
+        ? cs.onErrorContainer
+        : cs.onPrimaryContainer;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+      decoration: BoxDecoration(
+        color: containerColor.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: color.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isError ? Icons.error_outline_rounded : Icons.check_circle_rounded,
+            color: color,
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                color: onContainerColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+            onPressed: onDismiss,
+            icon: Icon(Icons.close_rounded, size: 18, color: onContainerColor),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _StatusBadge extends StatelessWidget {
   final bool active;
   final ColorScheme cs;
@@ -1120,14 +957,13 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-class _GlassTile extends StatefulWidget {
+class _GlassTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color? iconColor;
   final Color? textColor;
   final Widget? trailing;
   final VoidCallback? onTap;
-  final bool isActive;
   final ColorScheme cs;
   final bool isLight;
 
@@ -1138,97 +974,48 @@ class _GlassTile extends StatefulWidget {
     this.textColor,
     this.trailing,
     this.onTap,
-    this.isActive = false,
     required this.cs,
     required this.isLight,
   });
 
   @override
-  State<_GlassTile> createState() => _GlassTileState();
-}
-
-class _GlassTileState extends State<_GlassTile>
-    with SingleTickerProviderStateMixin {
-  double _scale = 1.0;
-
-  @override
   Widget build(BuildContext context) {
-    final iconColor = widget.iconColor ?? widget.cs.onSurface;
-    final textColor = widget.textColor ?? widget.cs.onSurface;
+    final finalIconColor = iconColor ?? cs.onSurface;
+    final finalTextColor = textColor ?? cs.onSurface;
 
-    return GestureDetector(
-      onTapDown: widget.onTap != null
-          ? (_) => setState(() => _scale = 0.96)
-          : null,
-      onTapUp: widget.onTap != null
-          ? (_) => setState(() => _scale = 1.0)
-          : null,
-      onTapCancel: () => setState(() => _scale = 1.0),
-      child: AnimatedScale(
-        scale: _scale,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOutCubic,
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(24),
-          child: InkWell(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            onTap: widget.onTap,
-            splashColor: widget.cs.primary.withValues(alpha: 0.08),
-            highlightColor: widget.cs.primary.withValues(alpha: 0.04),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                color: widget.isActive
-                    ? widget.cs.primary.withValues(
-                        alpha: widget.isLight ? 0.10 : 0.15,
-                      )
-                    : widget.isLight
-                    ? Colors.white.withValues(alpha: 0.6)
-                    : Colors.white.withValues(alpha: 0.06),
-                border: Border.all(
-                  color: widget.isActive
-                      ? widget.cs.primary.withValues(alpha: 0.3)
-                      : widget.isLight
-                      ? Colors.white.withValues(alpha: 0.7)
-                      : Colors.white.withValues(alpha: 0.10),
+            color: isLight
+                ? Colors.white.withValues(alpha: 0.6)
+                : Colors.white.withValues(alpha: 0.06),
+            border: Border.all(
+              color: isLight
+                  ? Colors.white.withValues(alpha: 0.7)
+                  : Colors.white.withValues(alpha: 0.10),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: finalIconColor),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: finalTextColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: iconColor.withValues(alpha: 0.10),
-                    ),
-                    child: Icon(widget.icon, size: 20, color: iconColor),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Text(
-                      widget.label,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
-                      ),
-                    ),
-                  ),
-                  if (widget.trailing != null)
-                    widget.trailing!
-                  else
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: 20,
-                      color: widget.cs.onSurfaceVariant.withValues(alpha: 0.4),
-                    ),
-                ],
-              ),
-            ),
+              trailing ?? const Icon(Icons.chevron_right_rounded),
+            ],
           ),
         ),
       ),
@@ -1236,96 +1023,15 @@ class _GlassTileState extends State<_GlassTile>
   }
 }
 
-class _ThemeToggle extends StatefulWidget {
-  final ColorScheme cs;
+class _ThemeSwitch extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool> onChanged;
 
-  const _ThemeToggle({required this.cs});
-
-  @override
-  State<_ThemeToggle> createState() => _ThemeToggleState();
-}
-
-class _ThemeToggleState extends State<_ThemeToggle>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _rotation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _rotation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutBack),
-    );
-  }
-
-  @override
-  void didUpdateWidget(covariant _ThemeToggle oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.cs.brightness != widget.cs.brightness) {
-      _controller.forward(from: 0);
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const _ThemeSwitch({required this.value, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.cs.brightness == Brightness.dark;
-    return AnimatedBuilder(
-      animation: _rotation,
-      builder: (context, _) {
-        return Transform.rotate(
-          angle: _rotation.value * 3.14159,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: 44,
-            height: 24,
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
-            ),
-            child: Align(
-              alignment: isDark ? Alignment.centerRight : Alignment.centerLeft,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: 18,
-                height: 18,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isDark
-                      ? const Color(0xFF6366F1)
-                      : const Color(0xFFF59E0B),
-                  boxShadow: [
-                    BoxShadow(
-                      color:
-                          (isDark
-                                  ? const Color(0xFF6366F1)
-                                  : const Color(0xFFF59E0B))
-                              .withValues(alpha: 0.3),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                  size: 12,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+    return Switch(value: value, onChanged: onChanged);
   }
 }
 
